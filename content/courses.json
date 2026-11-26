@@ -97,9 +97,18 @@
     {
       "id": "os",
       "name": "سیستم‌های عامل",
+      "short": "سیستم عامل",
+      "en": "Operating Systems",
       "group": "specialized",
       "order": 5,
-      "hasContent": false
+      "hasContent": true,
+      "icon": "os",
+      "color": {
+        "light": "#5f7d12",
+        "lightSoft": "rgba(95,125,18,.12)",
+        "dark": "#a8d05a",
+        "darkSoft": "rgba(168,208,90,.15)"
+      }
     },
     {
       "id": "ai",

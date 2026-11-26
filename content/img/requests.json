@@ -61,5 +61,41 @@
     "alt": "دو مسیر کوهستانی متفاوت که از یک نقطه جدا می‌شوند و هر دو به یک کلبه می‌رسند",
     "caption": "گرامر مبهم مثل دو راه متفاوت به یک مقصد است: یک رشته، دو درخت اشتقاق",
     "prompt": "A hiking trail that splits into two clearly different paths at a fork near the bottom of a hill, one winding left around a lake and one climbing right through pine trees, and both paths arrive at the same small mountain hut at the top. Two tiny hikers, one on each path. Clean flat illustration style, soft gradients, warm muted palette (sage, sand, dusty blue, rust). 16:9. No text, no letters, no numbers, no labels, no signposts."
+  },
+  {
+    "course": "os",
+    "pattern": "O1",
+    "file": "img/os/O1-convoy-truck.webp",
+    "placeAfterBlock": 1,
+    "alt": "یک کامیون کند و سنگین در جاده‌ای یک‌خطه که صف بلندی از خودروهای کوچک پشتش مانده‌اند",
+    "caption": "اثر کاروان در FCFS: یک کار طولانی جلوی صف همه کارهای کوتاه را پشت سر خودش نگه می‌دارد",
+    "prompt": "A narrow single-lane country road winding through gentle hills, 16:9, seen from a slightly elevated side angle. At the front, one huge slow heavily loaded old truck crawls forward; behind it a long line of small light cars and scooters is stuck bumper to bumper, unable to pass, while the road ahead of the truck is completely empty. The scene clearly reads as \"one slow vehicle holding up many fast ones\". Clean flat illustration style, soft gradients, warm muted palette (sand, olive, dusty blue, terracotta). No text, no letters, no numbers, no labels, no road signs."
+  },
+  {
+    "course": "os",
+    "pattern": "O2",
+    "file": "img/os/O2-one-lane-bridge.webp",
+    "placeAfterBlock": 0,
+    "alt": "پلی باریک و یک‌نفره روی دره که یک نفر روی آن است و چند نفر دو طرف پل منتظر نوبت‌اند",
+    "caption": "ناحیه بحرانی مثل پل یک‌نفره است: در هر لحظه فقط یک نفر رویش باشد (انحصار)، اگر پل خالی است کسی بی‌دلیل معطل نماند (پیشرفت) و هیچ‌کس تا ابد پشت پل نماند (انتظار محدود)",
+    "prompt": "A narrow wooden rope bridge over a deep green gorge, wide enough for only one person, 16:9. Exactly one hiker is crossing in the middle of the bridge. On both cliff edges small groups of hikers wait patiently in an orderly line for their turn. Calm daylight, mist in the valley. Clean flat illustration style, soft gradients, warm muted palette (moss green, sand, slate blue, rust). No text, no letters, no numbers, no labels, no signs."
+  },
+  {
+    "course": "os",
+    "pattern": "O5",
+    "file": "img/os/O5-gridlock.webp",
+    "placeAfterBlock": 0,
+    "alt": "چهار خودرو در یک چهارراه کوچک که هر کدام راه دیگری را بسته و هیچ‌کدام نمی‌تواند حرکت کند",
+    "caption": "بن‌بست: هر خودرو جایی را گرفته (نگه‌داشتن) و منتظر جای خودروی بعدی است و این انتظار یک دور بسته است",
+    "prompt": "Top-down view of a small four-way street intersection, 16:9. Four cars, each a different soft color, have each pushed halfway into the intersection from a different direction, so every car blocks the path of the next one in a perfect closed circle; none of them can move forward. Empty streets beyond. Clean flat illustration style, soft gradients, warm muted palette (asphalt grey, sand, teal, terracotta, mustard). No text, no letters, no numbers, no labels, no traffic signs, no road markings with symbols."
+  },
+  {
+    "course": "os",
+    "pattern": "O7",
+    "file": "img/os/O7-elevator-sweep.webp",
+    "placeAfterBlock": 1,
+    "alt": "برش یک ساختمان چندطبقه که آسانسورش طبقه به طبقه بالا می‌رود و آدم‌های منتظر در طبقه‌های مختلف ایستاده‌اند",
+    "caption": "الگوریتم آسانسور: بازو مثل آسانسور در یک جهت می‌رود، سر راه همه را سوار می‌کند و بعد برمی‌گردد",
+    "prompt": "Cutaway cross-section of a tall apartment building, 16:9, showing many floors side by side with one central elevator shaft. The elevator car is midway up, moving upward, with a faint motion trail below it. People wait at the elevator doors on several different floors above and below the car. Clean flat illustration style, soft gradients, warm muted palette (cream walls, olive, dusty blue, terracotta). No text, no letters, no numbers, no labels, no floor indicators, no arrows."
   }
 ]

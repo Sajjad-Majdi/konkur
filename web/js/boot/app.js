@@ -3,6 +3,7 @@ var VIEWS=['home'].concat(LIVE.map(function(c){return c.id;})).concat(['exam']),
 function navInd(){
   var nav=$('#nav'),on=$('#nav button[data-v="'+cur+'"]'),ind=$('#nav .ind');
   $$('#nav button').forEach(function(b){var o=b===on;b.classList.toggle('on',o);if(o)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
+  if(on&&nav.classList.contains('many')){var r0=nav.getBoundingClientRect(),b0=on.getBoundingClientRect();if(b0.left<r0.left+6)nav.scrollLeft-=r0.left+6-b0.left;else if(b0.right>r0.right-6)nav.scrollLeft+=b0.right-r0.right+6;}
   if(on&&ind){var nr=nav.getBoundingClientRect(),br=on.getBoundingClientRect();ind.style.width=br.width+'px';ind.style.transform='translateX('+(br.left-nr.left+nav.scrollLeft)+'px)';}
 }
 function show(v,sub){

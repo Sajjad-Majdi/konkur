@@ -587,6 +587,7 @@ pre.code{direction:ltr;text-align:left;margin:10px 0 2px;padding:10px 12px;borde
 .rvw-t .tw{margin:6px 0}
 .rvw-t .dt{font-size:12.5px;line-height:1.7}
 .rvw-t .dt td.w,.rvw-t .dt th.w{white-space:normal;text-align:start;min-width:5em}
+.qt code,.steps code,.rvw-f figcaption code{direction:ltr;unicode-bidi:isolate;font-family:Consolas,"Cascadia Mono",Menlo,monospace;font-size:12.5px;background:var(--bg2);padding:1px 5px;border-radius:6px;overflow-wrap:anywhere}
 .rvw-t code{direction:ltr;unicode-bidi:isolate;font-family:Consolas,"Cascadia Mono",Menlo,monospace;font-size:12px;background:var(--bg2);padding:1px 5px;border-radius:6px;white-space:nowrap}
 /* refresher figures (web/js/tools/rv-*.js) */
 .rf{direction:ltr;fill:var(--ink);font-size:12px}

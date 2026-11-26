@@ -309,7 +309,7 @@ def solver_checks():
         bad = [(u, v) for u in adj for v, w in adj[u] if h[u] > w + h[v]]
         return adm, bad
     ok(check(True, h2) == (True, [('D', 'B')]) and check(True, h1) == (True, []) and check(False, h2) == (True, []), '1404 Q74 heuristics')
-    return errs + toc_checks()
+    return errs + toc_checks() + os_checks()
 
 
 # ---------------- theory of languages: brute-force re-solving on short strings ----------------
@@ -434,6 +434,283 @@ def toc_checks():
     rep = {}
     for w in _words('ab', 4): rep.setdefault(reach(w), w)
     ok(sorted(rep.values()) == sorted(['', 'a', 'b', 'aa', 'ab']) and reach('aab') == reach('ab'), '1400 Q55 classes')
+    return errs
+
+
+# ---------------- operating systems: re-solving by simulation and brute force ----------------
+def _sched_prio_np(jobs):
+    """non-preemptive priority, all jobs at time 0; jobs = [(name, burst, prio)], lower prio = first; returns waits"""
+    t, w = 0, {}
+    for name, b, p in sorted(jobs, key=lambda j: j[2]):
+        w[name] = t; t += b
+    return w
+
+
+def _periodic(tasks, prio, horizon):
+    """preemptive fixed-priority periodic tasks; tasks = [(C, T)], prio = task indices best first; deadline = period.
+    returns (feasible, busy time) over [0, horizon) in unit steps"""
+    rem = [0] * len(tasks); busy = 0
+    for t in range(horizon):
+        for i, (c, p) in enumerate(tasks):
+            if t % p == 0:
+                if rem[i] > 0: return False, busy
+                rem[i] = c
+        for i in prio:
+            if rem[i] > 0: rem[i] -= 1; busy += 1; break
+    return all(r == 0 for r in rem), busy
+
+
+def _interleave(progs, init):
+    """all complete runs of straight-line semaphore programs. progs = [[op]], op = ('w', s) | ('s', s) | ('x', label).
+    returns (set of label orders of runs that finish, deadlock reachable)"""
+    orders, dead, seen = set(), False, set()
+    stack = [(tuple(0 for _ in progs), tuple(sorted(init.items())), ())]
+    while stack:
+        pcs, sem, out = stack.pop()
+        key = (pcs, sem, out)
+        if key in seen: continue
+        seen.add(key); S = dict(sem); moved = False
+        for i, pr in enumerate(progs):
+            if pcs[i] >= len(pr): continue
+            op, a = pr[pcs[i]]
+            if op == 'w' and S[a] == 0: continue
+            S2 = dict(S); o2 = out
+            if op == 'w': S2[a] -= 1
+            elif op == 's': S2[a] += 1
+            else: o2 = out + (a,)
+            np_ = list(pcs); np_[i] += 1; moved = True
+            stack.append((tuple(np_), tuple(sorted(S2.items())), o2))
+        if not moved:
+            if all(pcs[i] >= len(p) for i, p in enumerate(progs)): orders.add(out)
+            else: dead = True
+    return orders, dead
+
+
+def _dekker():
+    """1400 Q104 (Dekker): explore every interleaving of the two processes (a process may also stay in its remainder section).
+    returns (mutual exclusion, progress = from every state where someone tries some process can still enter,
+    starvation-free = no cycle in which both processes keep taking steps while P_i tries and never enters)"""
+    # pc: 0 remainder, 1 flag=T, 2 while flag[j], 3 if turn==j, 4 flag=F, 5 while turn==j, 6 flag=T, 7 CS, 8 turn=j, 9 flag=F
+    def step(st, i):
+        pc, fl, turn = list(st[0]), list(st[1]), st[2]
+        j = 1 - i; p = pc[i]
+        if p == 0: pc[i] = 1
+        elif p == 1: fl[i] = 1; pc[i] = 2
+        elif p == 2: pc[i] = 3 if fl[j] else 7
+        elif p == 3: pc[i] = 4 if turn == j else 2
+        elif p == 4: fl[i] = 0; pc[i] = 5
+        elif p == 5: pc[i] = 5 if turn == j else 6
+        elif p == 6: fl[i] = 1; pc[i] = 2
+        elif p == 7: pc[i] = 8
+        elif p == 8: turn = j; pc[i] = 9
+        elif p == 9: fl[i] = 0; pc[i] = 0
+        return (tuple(pc), tuple(fl), turn)
+    starts = [((0, 0), (0, 0), t) for t in (0, 1)]
+    seen, todo, edges = set(starts), list(starts), {}
+    while todo:
+        s = todo.pop()
+        edges[s] = [(i, step(s, i)) for i in (0, 1)] + [(i, s) for i in (0, 1) if s[0][i] == 0]
+        for _, n in edges[s]:
+            if n not in seen: seen.add(n); todo.append(n)
+    mutex = all(s[0] != (7, 7) for s in seen)
+    good = {s for s in seen if 7 in s[0]}
+    changed = True
+    while changed:
+        changed = False
+        for s in seen:
+            if s not in good and any(n in good for _, n in edges[s]): good.add(s); changed = True
+    progress = all(s in good for s in seen if any(1 <= p <= 6 for p in s[0]))
+    starve = False
+    for i in (0, 1):
+        T = {s for s in seen if 1 <= s[0][i] <= 6}
+        reach = {}
+        for s in T:
+            r, st = set(), [s]
+            while st:
+                x = st.pop()
+                for _, n in edges[x]:
+                    if n in T and n not in r: r.add(n); st.append(n)
+            reach[s] = r
+        for s in T:
+            if s not in reach[s]: continue
+            scc = {x for x in reach[s] if s in reach[x]}
+            moves = {m for x in scc for m, n in edges[x] if n in scc}
+            starve |= moves == {0, 1}
+    return mutex, progress, not starve
+
+
+def _tas_bw(n):
+    """1399 Q99: the bounded-waiting test_and_set code WITHOUT 'else waiting[j] = false' and without 'j != i' in the scan.
+    returns True if a state is reachable where some process waits, nobody is in or near the CS, and no process can ever enter"""
+    # pc: 0 rem, 1 waiting=T, 2 key=T, 3 loop test, 4 key=TAS, 5 waiting=F, 6 CS, 7 j=i+1, 8 scan test, 9 j++, 10 if j==i, 11 lock=F
+    def step(st, i):
+        pc, wt, key, js, lock = list(st[0]), list(st[1]), list(st[2]), list(st[3]), st[4]
+        p = pc[i]
+        if p == 0: pc[i] = 1
+        elif p == 1: wt[i] = 1; pc[i] = 2
+        elif p == 2: key[i] = 1; pc[i] = 3
+        elif p == 3: pc[i] = 4 if (wt[i] and key[i]) else 5
+        elif p == 4: key[i] = lock; lock = 1; pc[i] = 3
+        elif p == 5: wt[i] = 0; pc[i] = 6
+        elif p == 6: pc[i] = 7
+        elif p == 7: js[i] = (i + 1) % n; pc[i] = 8
+        elif p == 8: pc[i] = 9 if not wt[js[i]] else 10
+        elif p == 9: js[i] = (js[i] + 1) % n; pc[i] = 8
+        elif p == 10: pc[i] = 11 if js[i] == i else 0
+        elif p == 11: lock = 0; pc[i] = 0
+        return (tuple(pc), tuple(wt), tuple(key), tuple(js), lock)
+    start = (tuple([0] * n), tuple([0] * n), tuple([0] * n), tuple([0] * n), 0)
+    seen, todo, edges = {start}, [start], {}
+    while todo:
+        s = todo.pop(); edges[s] = [step(s, i) for i in range(n)]
+        for x in edges[s]:
+            if x not in seen: seen.add(x); todo.append(x)
+    good = {s for s in seen if 6 in s[0]}
+    changed = True
+    while changed:
+        changed = False
+        for s in seen:
+            if s not in good and any(x in good for x in edges[s]): good.add(s); changed = True
+    return any(s not in good and any(1 <= p <= 4 for p in s[0]) for s in seen)
+
+
+def _bank_safe(avail, alloc, need):
+    """banker's safety check; returns the set of processes that can never finish"""
+    work, done, prog = list(avail), [False] * len(alloc), True
+    while prog:
+        prog = False
+        for i in range(len(alloc)):
+            if not done[i] and all(n <= w for n, w in zip(need[i], work)):
+                work = [w + a for w, a in zip(work, alloc[i])]; done[i] = True; prog = True
+    return {i for i in range(len(alloc)) if not done[i]}
+
+
+def _look(head, reqs, up=True):
+    """elevator (LOOK) total head movement, starting in direction up"""
+    hi = sorted(r for r in reqs if r >= head); lo = sorted((r for r in reqs if r < head), reverse=True)
+    path = hi + lo
+    pos, tot = head, 0
+    for r in path: tot += abs(r - pos); pos = r
+    return tot
+
+
+def _sched(ps, alg, q=4):
+    """unit-step CPU scheduler, same rules as the site's gantt tool; ps = [(arrival, burst)]; returns completion times"""
+    n = len(ps); rem = [b for _, b in ps]; arr = [0] * n; fin = [0] * n; queue = []; cur = -1; ql = 0; t = 0; done = 0
+    def best(key):
+        c = [j for j in range(n) if arr[j] and rem[j] > 0]
+        return min(c, key=lambda j: (key(j), ps[j][0], j)) if c else -1
+    while done < n:
+        for i in range(n):
+            if not arr[i] and ps[i][0] <= t: arr[i] = 1; queue.append(i)
+        if alg == 'rr':
+            if cur >= 0 and ql <= 0: queue.append(cur); cur = -1
+            if cur < 0 and queue: cur = queue.pop(0); ql = q
+        elif alg == 'srtf':
+            b = best(lambda j: rem[j])
+            if cur < 0 or (b >= 0 and rem[b] < rem[cur]): cur = b
+        elif cur < 0:
+            cur = best((lambda j: ps[j][1]) if alg == 'sjf' else (lambda j: ps[j][0]))
+        if cur < 0: t += 1; continue
+        if alg == 'rr' and cur in queue: queue.remove(cur)
+        rem[cur] -= 1; t += 1; ql -= 1
+        if rem[cur] == 0: fin[cur] = t; done += 1; cur = -1
+    return fin
+
+
+def _paging(refs, k, alg):
+    fr, load, used, faults = [], [], [], 0
+    for t, r in enumerate(refs):
+        if r in fr: used[fr.index(r)] = t; continue
+        faults += 1
+        if len(fr) < k: fr.append(r); load.append(t); used.append(t); continue
+        if alg == 'fifo': v = min(range(k), key=lambda i: load[i])
+        elif alg == 'lru': v = min(range(k), key=lambda i: used[i])
+        else:
+            nx = lambda p: refs.index(p, t + 1) if p in refs[t + 1:] else 10 ** 9
+            v = max(range(k), key=lambda i: (nx(fr[i]), -i))
+        fr[v] = r; load[v] = t; used[v] = t
+    return faults
+
+
+def os_checks():
+    errs = []
+    def ok(cond, msg):
+        if not cond: errs.append('solver: os ' + msg)
+    # ---- O1 scheduling ----
+    w = _sched_prio_np([('P1', 10, 3), ('P2', 1, 1), ('P3', 2, 4), ('P4', 1, 5), ('P5', 5, 2)])
+    ok(F(sum(w.values()), 5) == F(41, 5), '1400 Q107 priority average wait != 8.2')
+    best = max(x for x in range(1, 80) if _periodic([(25, 50), (x, 80)], [0, 1], 400)[0])
+    ok(best == 30 and not _periodic([(25, 50), (35, 80)], [0, 1], 400)[0], '1400 Q106 RM max x != 30')
+    # 1401 Q102: priority by C/T (P1 .2, P3 .25, P2 .4); feasible over the hyperperiod 200, utilization 170/200
+    fe, busy = _periodic([(5, 25), (20, 50), (10, 40)], [0, 2, 1], 200)
+    ok(fe and F(busy, 200) == F(85, 100), '1401 Q102 utilization != 0.85')
+    ok(19 * (10 + 2) == 228, '1403 Q97 RR wait')
+    # ---- O2 synchronization ----
+    def cas_old(mem, exp, new):  # textbook compare_and_swap returns the old value
+        old = mem[0]
+        if old == exp: mem[0] = new
+        return old
+    m = [0]
+    if cas_old(m, 0, 10): m[0] += 2
+    else: m[0] *= 5
+    ok(m[0] == 50, '1405 Q100 CAS result %d' % m[0])
+    X = lambda s: ('x', s); W = lambda s: ('w', s); G = lambda s: ('s', s)
+    opts = [
+        [[X(1), G('a')], [W('a'), X(2), G('b')], [W('b'), X(3), G('c')], [W('c'), X(4)]],
+        [[X(1), G('a'), G('b')], [W('b'), X(2), G('a')], [W('a'), X(3), G('b')], [W('a'), W('b'), X(4)]],
+        [[X(1), G('a')], [W('a'), X(2), G('a'), G('a')], [W('a'), W('a'), X(3), G('a'), G('a'), G('a')], [W('a'), W('a'), W('a'), X(4)] + [G('a')] * 4],
+        [[X(1), W('a'), G('b'), G('c')], [W('a'), X(2), G('b'), G('c')], [W('a'), G('b'), X(3), G('c')], [W('a'), G('b'), G('c'), X(4)]],
+    ]
+    forced = [(lambda r: r == ({(1, 2, 3, 4)}, False))(_interleave(p, {'a': 0, 'b': 0, 'c': 0})) for p in opts]
+    ok(forced == [True, False, False, False], '1400 Q102 only option 1 forces S1..S4: %s' % forced)
+    r = _dekker()
+    ok(r == (True, True, True), '1400 Q104 Dekker (mutex, progress, no starvation) = %s' % (r,))
+    ok(_tas_bw(2) and _tas_bw(3), '1399 Q99 progress should be violated')
+    outs, dead = _interleave([[X('A'), W('s'), X('B')], [X('C'), G('s'), X('D')]], {'s': 0})
+    outs = {''.join(o) for o in outs}
+    ok('ABCD' not in outs and {'ACDB', 'CABD', 'CADB'} <= outs and not dead, '1399 Q108 outputs %s' % sorted(outs))
+    # ---- O4 paging ----
+    ok(-(-(47 - 14) // (14 - 3)) == 3, '1400 Q103 levels')
+    ok(2 ** (32 - 14) * 4 == 2 ** 20, '1402 Q97 page table 1 MB')
+    a = next(a for a in range(21) if 2 ** a == 4 * 2 ** (20 - a))
+    ok(a == 11 and (2 ** a * 4 + 1024 * 2 ** (20 - a) * 4) // 1024 == 2056, '1403 Q99 2056 KB')
+    pbits = (129 - 1).bit_length(); ok(20 - (19 - pbits) == 9, '1399 Q104 entry bits')
+    # ---- O5 deadlock ----
+    alloc = [(0, 0, 1, 2), (1, 0, 0, 1), (1, 3, 0, 4), (0, 6, 3, 2), (0, 0, 1, 4)]
+    mx = [(0, 0, 1, 2), (1, 5, 1, 1), (2, 3, 5, 6), (0, 6, 7, 2), (0, 6, 5, 6)]
+    need = [tuple(x - y for x, y in zip(m_, a_)) for m_, a_ in zip(mx, alloc)]
+    ok(_bank_safe((1, 5, 2, 0), alloc, need) == {2, 3, 4}, '1402 Q99 stuck set')
+    def can_dead(m, maxes):  # some allocation with every process short of its max and too few free units for all
+        for al in itertools.product(*[range(k) for k in maxes]):
+            free = m - sum(al)
+            if free >= 0 and all(free < k - x for k, x in zip(maxes, al)): return True
+        return False
+    ok([m for m in range(5, 16) if not can_dead(m, (3, 4, 6))][0] == 11, '1400 Q105 min m != 11')
+    ok(3 * 5 * 5 == 75, '1403 Q101')
+    # ---- O6 memory access time ----
+    ok(F(98, 100) * 150 + F(2, 100) * 450 == 156, '1401 Q104 EAT != 156')
+    p_lim = F(10, 25 * 10 ** 6 - 100)
+    ok(F(4, 10 ** 7) < p_lim < F(5, 10 ** 7) and F(3, 10 ** 6) > p_lim, '1402 Q98 p bound')
+    ok(60 * 100 // 2 == 3000 and 6 * 2048 - 900 == 11388, '1402 Q102 / 1399 Q103')
+    # ---- O7 disk ----
+    ok(_look(20, [10, 22, 20, 2, 40, 6, 38]) * 6 == 348, '1402 Q96 elevator != 348')
+    ok(_look(35, [34, 45, 39, 80, 12, 25, 44]) * 5 == 565, '1399 Q107 elevator != 565')
+    # ---- figures and tables of the «یادآوری» refreshers ----
+    ps = [(0, 8), (1, 4), (2, 9), (3, 5)]
+    avg = {a: F(sum(c - p[0] - p[1] for c, p in zip(_sched(ps, a), ps)), 4) for a in ('fcfs', 'sjf', 'srtf', 'rr')}
+    ok(avg == {'fcfs': F(35, 4), 'sjf': F(31, 4), 'srtf': F(13, 2), 'rr': F(47, 4)}, 'O1 review Gantt averages %s' % avg)
+    ref = [7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2, 1, 2, 0, 1, 7, 0, 1]
+    ok([_paging(ref, 3, a) for a in ('fifo', 'lru', 'opt')] == [15, 12, 9], 'O6 review FIFO/LRU/OPT counts')
+    bel = [1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5]
+    ok(_paging(bel, 3, 'fifo') == 9 and _paging(bel, 4, 'fifo') == 10, 'O6 review Belady example')
+    rq = [150, 10, 185, 70, 35, 110]; pos, fc = 90, 0
+    for r in rq: fc += abs(r - pos); pos = r
+    pos, left, ss = 90, list(rq), 0
+    while left:
+        r = min(left, key=lambda c: (abs(c - pos), c)); ss += abs(r - pos); pos = r; left.remove(r)
+    ok((fc, ss, _look(90, rq), (199 - 90) + (199 - 10), (185 - 90) + (185 - 10) + (70 - 10)) == (600, 255, 270, 298, 330), 'O7 review disk table')
+    ok(sum(max(m_ - a_, 0) for m_, a_ in ((10, 5), (4, 2), (9, 2))) == 14 and _bank_safe((3,), [(5,), (2,), (2,)], [(5,), (2,), (7,)]) == set(), 'O5 review banker example')
     return errs
 
 

@@ -1,6 +1,7 @@
 {
   "about": "Answer keys kept apart from the content files. The build fails if any question in content/ disagrees with this file. 'expected' is the key table checked by re-solving every question; 'official1405' is the final key printed on the last page of the 1405 Sanjesh booklet, by question number.",
   "srcRules": {
+    "1399": "s",
     "1400": "s",
     "1401": [
       "v",
@@ -21,7 +22,7 @@
     "1405": "s"
   },
   "srcLabels": {
-    "s": "final Sanjesh key (TOC 1401-1405 and all 1400/1405 use the final-key PDFs)",
+    "s": "final Sanjesh key (TOC 1401-1405, OS 1399-1405 and all 1400/1405 use the final-key PDFs)",
     "k": "Sanjesh key (initial for 1402-1403)",
     "v": "independent solution (1401 key unreadable)"
   },
@@ -107,7 +108,43 @@
     "toc-1405-47": 3,
     "toc-1405-48": 1,
     "toc-1405-49": 4,
-    "toc-1405-50": 2
+    "toc-1405-50": 2,
+    "os-1399-99": 4,
+    "os-1399-100": 1,
+    "os-1399-102": 1,
+    "os-1399-103": 3,
+    "os-1399-104": 2,
+    "os-1399-107": 1,
+    "os-1399-108": 1,
+    "os-1400-101": 2,
+    "os-1400-102": 1,
+    "os-1400-103": 2,
+    "os-1400-104": 4,
+    "os-1400-105": 2,
+    "os-1400-106": 3,
+    "os-1400-107": 3,
+    "os-1401-102": 3,
+    "os-1401-104": 1,
+    "os-1401-106": 2,
+    "os-1401-107": 2,
+    "os-1402-96": 2,
+    "os-1402-97": 1,
+    "os-1402-98": 2,
+    "os-1402-99": 4,
+    "os-1402-100": 1,
+    "os-1402-102": 3,
+    "os-1403-97": 3,
+    "os-1403-98": 1,
+    "os-1403-99": 4,
+    "os-1403-100": 2,
+    "os-1403-101": 4,
+    "os-1404-96": 3,
+    "os-1404-99": 4,
+    "os-1405-97": 4,
+    "os-1405-98": 2,
+    "os-1405-99": 1,
+    "os-1405-100": 1,
+    "os-1405-101": 4
   },
   "official1405": {
     "46": 1,
@@ -127,6 +164,11 @@
     "70": 4,
     "71": 3,
     "72": 3,
-    "74": 4
+    "74": 4,
+    "97": 4,
+    "98": 2,
+    "99": 1,
+    "100": 1,
+    "101": 4
   }
 }
