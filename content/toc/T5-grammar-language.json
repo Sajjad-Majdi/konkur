@@ -4,7 +4,11 @@
   "title": "زبان یک گرامر را پیدا کن",
   "en": "Language of a grammar · CFG and unrestricted",
   "frequency": "در ۳ کنکور از ۶ کنکور اخیر و ۱۴۰۱ با دو سوال",
-  "rank": { "order": 18, "repeat": "۳ از ۶", "hours": 1.5 },
+  "rank": {
+    "order": 18,
+    "repeat": "۳ از ۶",
+    "hours": 1.5
+  },
   "review": [
     {
       "type": "text",
@@ -45,10 +49,17 @@
     "حالت‌های مرزی را جدا ببین؛ مثلاً اگر قانونی فقط کنار یک حرف اجرا می‌شود برای رشته‌های خیلی کوتاه چه می‌شود"
   ],
   "example": "toc-1403-50",
-  "practice": ["toc-1401-55", "toc-1400-53"],
+  "practice": [
+    "toc-1401-55",
+    "toc-1400-53"
+  ],
   "questions": [
     {
-      "id": "toc-1403-50", "year": 1403, "number": 50, "src": "k", "key": 2,
+      "id": "toc-1403-50",
+      "year": 1403,
+      "number": 50,
+      "src": "s",
+      "key": 2,
       "text": "کدام مورد، زبان تولیدشده توسط گرامر زیر را توصیف می‌کند؟<br>$S\\to aSc\\mid aS\\mid A$<br>$A\\to bAcc\\mid bA\\mid bAc\\mid\\varepsilon$",
       "options": [
         "$\\{a^mb^nc^p\\mid 2m+n\\ge p\\}$",
@@ -65,7 +76,11 @@
       ]
     },
     {
-      "id": "toc-1401-55", "year": 1401, "number": 55, "src": "v", "key": 1,
+      "id": "toc-1401-55",
+      "year": 1401,
+      "number": 55,
+      "src": "s",
+      "key": 1,
       "text": "گرامر زیر کدام‌یک از زبان‌های زیر را توصیف می‌کند؟<br>$S\\to aSd\\mid A\\mid B$<br>$A\\to aAc\\mid C$<br>$B\\to bBd\\mid C$<br>$C\\to bCc\\mid\\varepsilon$",
       "options": [
         "$\\{a^mb^nc^pd^q\\mid m+n=p+q\\}$",
@@ -82,7 +97,11 @@
       ]
     },
     {
-      "id": "toc-1400-53", "year": 1400, "number": 53, "src": "s", "key": 1,
+      "id": "toc-1400-53",
+      "year": 1400,
+      "number": 53,
+      "src": "s",
+      "key": 1,
       "text": "گرامر زیر چه زبانی را تولید می‌کند؟ ($\\varepsilon$ بیانگر رشته تهی است.)<br>$S\\to S_1B$<br>$S_1\\to aS_1b$<br>$bB\\to bbbB$<br>$aS_1b\\to aa$<br>$B\\to\\varepsilon$",
       "options": [
         "$L(G)=\\{a^{n+1}b^{n+k}\\mid n\\ge 1,\\ k=-1,1,3,5,\\ldots\\}$",

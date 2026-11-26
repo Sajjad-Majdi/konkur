@@ -168,7 +168,7 @@ def check_content(A, reg_names):
         y, n, s = q['year'], q['number'], q['src']
         rule = rules.get(str(y))
         if rule is None: errs.append('no source rule for year %d (%s)' % (y, qid))
-        elif s != rule: errs.append('src label %s is %s, must be %s' % (qid, s, rule))
+        elif s not in (rule if isinstance(rule, list) else [rule]): errs.append('src label %s is %s, must be %s' % (qid, s, rule))
         if y == 1405 and k1405.get(n) != q['key']: errs.append('1405 official mismatch ' + qid)
     # ---- Shamsi conversion used on the site ----
     for g, j in (((2027, 5, 6), (1406, 2, 16)), ((2026, 12, 7), (1405, 9, 16)), ((2026, 12, 13), (1405, 9, 22)), ((2026, 3, 21), (1405, 1, 1)), ((2025, 3, 20), (1403, 12, 30))):

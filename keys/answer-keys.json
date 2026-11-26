@@ -2,14 +2,26 @@
   "about": "Answer keys kept apart from the content files. The build fails if any question in content/ disagrees with this file. 'expected' is the key table checked by re-solving every question; 'official1405' is the final key printed on the last page of the 1405 Sanjesh booklet, by question number.",
   "srcRules": {
     "1400": "s",
-    "1401": "v",
-    "1402": "k",
-    "1403": "k",
-    "1404": "k",
+    "1401": [
+      "v",
+      "s"
+    ],
+    "1402": [
+      "k",
+      "s"
+    ],
+    "1403": [
+      "k",
+      "s"
+    ],
+    "1404": [
+      "k",
+      "s"
+    ],
     "1405": "s"
   },
   "srcLabels": {
-    "s": "final Sanjesh key",
+    "s": "final Sanjesh key (TOC 1401-1405 and all 1400/1405 use the final-key PDFs)",
     "k": "Sanjesh key (initial for 1402-1403)",
     "v": "independent solution (1401 key unreadable)"
   },

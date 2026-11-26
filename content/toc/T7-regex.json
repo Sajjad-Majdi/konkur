@@ -4,7 +4,11 @@
   "title": "عبارت منظم: معادل بودن و ساختن از روی ماشین",
   "en": "Regular expressions · equivalence · automaton to regex",
   "frequency": "در ۲ کنکور از ۶ کنکور اخیر و ۱۴۰۲ با دو سوال",
-  "rank": { "order": 17, "repeat": "۲ از ۶", "hours": 1 },
+  "rank": {
+    "order": 17,
+    "repeat": "۲ از ۶",
+    "hours": 1
+  },
   "review": [
     {
       "type": "text",
@@ -48,10 +52,17 @@
     "ستاره همیشه $\\varepsilon$ را دارد؛ $\\varepsilon$ را هم در هر گزینه امتحان کن"
   ],
   "example": "toc-1404-47",
-  "practice": ["toc-1402-46", "toc-1402-49"],
+  "practice": [
+    "toc-1402-46",
+    "toc-1402-49"
+  ],
   "questions": [
     {
-      "id": "toc-1404-47", "year": 1404, "number": 47, "src": "k", "key": 2,
+      "id": "toc-1404-47",
+      "year": 1404,
+      "number": 47,
+      "src": "s",
+      "key": 2,
       "text": "زبان کدام‌یک از عبارت‌های منظم زیر، با بقیه فرق دارد؟",
       "options": [
         "$(0+\\varepsilon)(1+10)^*$",
@@ -66,7 +77,11 @@
       ]
     },
     {
-      "id": "toc-1402-46", "year": 1402, "number": 46, "src": "k", "key": 4,
+      "id": "toc-1402-46",
+      "year": 1402,
+      "number": 46,
+      "src": "s",
+      "key": 4,
       "figure": "figToc1402q46",
       "text": "عبارت منظم (regular expression) توصیف‌کننده زبان پذیرنده متناهی زیر کدام است؟ (منظور از $\\varepsilon$ رشته به طول صفر است.)",
       "options": [
@@ -83,7 +98,11 @@
       ]
     },
     {
-      "id": "toc-1402-49", "year": 1402, "number": 49, "src": "k", "key": 1,
+      "id": "toc-1402-49",
+      "year": 1402,
+      "number": 49,
+      "src": "s",
+      "key": 1,
       "text": "اگر $L_1=L(0^*1^*)\\subseteq\\{0,1\\}^*$ و $L_2=\\{W_1W_2\\mid W_2W_1\\in L_1\\}$، آنگاه $L_2$ به وسیلهٔ کدام‌یک از عبارات منظم (regular expression) زیر تعریف می‌شود؟",
       "options": [
         "$0^*1^*0^*+1^*0^*1^*$",
