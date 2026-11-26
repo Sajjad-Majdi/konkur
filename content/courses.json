@@ -1,0 +1,133 @@
+{
+  "exam": {
+    "year": 1406,
+    "field": "مهندسی و علم کامپیوتر",
+    "code": 1277,
+    "date": "2027-05-06",
+    "days": "پنج‌شنبه و جمعه ۱۶ و ۱۷ اردیبهشت",
+    "dayNote": "روز دقیق آزمون گروه کامپیوتر روی کارت ورود به جلسه چاپ می‌شود",
+    "registration": {
+      "start": "2026-12-07",
+      "end": "2026-12-13",
+      "url": "https://www.sanjesh.org",
+      "urlLabel": "sanjesh.org"
+    },
+    "questions": 85,
+    "minutes": 190,
+    "estimate": "تعداد سوال و زمان تخمینی است و دفترچه رسمی هنگام ثبت‌نام منتشر می‌شود",
+    "sameForAllTracks": "ضرایب برای همه گرایش‌ها یکسان است",
+    "removed": [
+      "ریاضی ۱ و ۲",
+      "سیگنال‌ها و سیستم‌ها",
+      "الکترونیک دیجیتال",
+      "شبکه‌های کامپیوتری",
+      "پایگاه داده"
+    ],
+    "source": "<bdi class=\"u\">konkurcomputer.ir</bdi> و منابع دیگر به نقل از اطلاعیه سازمان سنجش"
+  },
+  "groups": [
+    {
+      "id": "specialized",
+      "name": "دروس تخصصی",
+      "coef": 4,
+      "approxQuestions": 40
+    },
+    {
+      "id": "math",
+      "name": "ریاضیات",
+      "coef": 2,
+      "approxQuestions": 20
+    }
+  ],
+  "courses": [
+    {
+      "id": "basics",
+      "name": "مبانی کامپیوتر و برنامه‌سازی",
+      "group": "specialized",
+      "order": 3,
+      "hasContent": false
+    },
+    {
+      "id": "logic",
+      "name": "مدارهای منطقی",
+      "group": "specialized",
+      "order": 6,
+      "hasContent": false
+    },
+    {
+      "id": "arch",
+      "name": "معماری کامپیوتر",
+      "group": "specialized",
+      "order": 7,
+      "hasContent": false
+    },
+    {
+      "id": "ds",
+      "name": "ساختمان داده و الگوریتم",
+      "official": "داده‌ساختارها و الگوریتم‌ها",
+      "short": "ساختمان داده",
+      "en": "Data Structures & Algorithms",
+      "group": "specialized",
+      "order": 2,
+      "hasContent": true,
+      "icon": "ds",
+      "color": {
+        "light": "#0f8a7a",
+        "lightSoft": "rgba(15,138,122,.12)",
+        "dark": "#45cdb7",
+        "darkSoft": "rgba(69,205,183,.14)"
+      }
+    },
+    {
+      "id": "toc",
+      "name": "نظریه زبان‌ها و ماشین‌ها",
+      "group": "specialized",
+      "order": 4,
+      "hasContent": false
+    },
+    {
+      "id": "os",
+      "name": "سیستم‌های عامل",
+      "group": "specialized",
+      "order": 5,
+      "hasContent": false
+    },
+    {
+      "id": "ai",
+      "name": "هوش مصنوعی",
+      "short": "هوش مصنوعی",
+      "en": "Artificial Intelligence",
+      "group": "specialized",
+      "order": 1,
+      "hasContent": true,
+      "icon": "ai",
+      "color": {
+        "light": "#5b4bd6",
+        "lightSoft": "rgba(91,75,214,.11)",
+        "dark": "#a395ff",
+        "darkSoft": "rgba(163,149,255,.15)"
+      }
+    },
+    {
+      "id": "discrete",
+      "name": "ریاضیات گسسته",
+      "group": "math",
+      "order": 8,
+      "hasContent": false
+    },
+    {
+      "id": "prob",
+      "name": "آمار و احتمال مهندسی",
+      "group": "math",
+      "order": 9,
+      "hasContent": false
+    },
+    {
+      "id": "linalg",
+      "name": "جبر خطی",
+      "group": "math",
+      "order": 10,
+      "hasContent": false
+    }
+  ]
+}

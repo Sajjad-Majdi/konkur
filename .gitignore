@@ -1,0 +1,7 @@
+# docs/ is the published site and is committed.
+# The single-file build goes to ../Executables, outside this folder.
+preview*.html
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
