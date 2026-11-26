@@ -138,7 +138,8 @@ def check_content(A, reg_names):
                     size = os.path.getsize(path); images[src] = size
                     if size > IMG_WARN: warns.append('image %s is %d KB (over 150 KB)' % (src, size // 1024))
         r = p.get('rank')
-        if r is not None and not (isinstance(r.get('order'), int) and r.get('repeat') and isinstance(r.get('hours'), (int, float))):
+        if r is None: errs.append('%s: rank is required (study order)' % where)
+        elif not (isinstance(r.get('order'), int) and r.get('repeat') and isinstance(r.get('hours'), (int, float))):
             errs.append('%s: rank needs order, repeat, hours' % where)
     orders = [p['rank']['order'] for p in A['patterns'] if p.get('rank')]
     if len(orders) != len(set(orders)): errs.append('duplicate rank order across patterns')
@@ -152,10 +153,41 @@ def check_content(A, reg_names):
     for c, st in A['selftests'].items():
         for q in st.get('questions', []):
             if q['id'] not in st.get('ids', []): errs.append('%s: question %s is not in ids' % (st['_file'], q['id']))
-    for d in A['plan']['days']:
-        for pid in d.get('patterns', []):
-            if pid not in pat_ids: errs.append('plan %s: unknown pattern %s' % (d['id'], pid))
-        if not d.get('patterns') and not d.get('text'): errs.append('plan %s needs patterns or text' % d['id'])
+    # ---- study plan v2: phases with days, or "soon": N days for a course without content ----
+    plan, cmap = A['plan'], {c['id']: c for c in A['courses']}
+    if not re.match(r'^\d{4}-\d{2}-\d{2}$', plan.get('start', '')): errs.append('plan.json: bad start date')
+    day_ids, planned, ndays = set(), set(), 0
+    for ph in plan.get('phases', []):
+        pid_ = ph.get('id', '?')
+        for f in ('id', 'name', 'short'):
+            if not ph.get(f): errs.append('plan phase %s lacks %s' % (pid_, f))
+        for c in ph.get('courses', []):
+            if c not in cmap: errs.append('plan phase %s: unknown course %s' % (pid_, c))
+            elif ph.get('soon') and cmap[c].get('hasContent'): errs.append('plan phase %s: course %s has content, give it days' % (pid_, c))
+        if bool(ph.get('soon')) == bool(ph.get('days')): errs.append('plan phase %s needs either days or soon' % pid_)
+        if ph.get('soon'):
+            if not isinstance(ph['soon'], int) or ph['soon'] < 1: errs.append('plan phase %s: soon must be a day count' % pid_)
+            else: ndays += ph['soon']
+        for d in ph.get('days') or []:
+            ndays += 1
+            if d.get('id') in day_ids: errs.append('plan: duplicate day id %s' % d.get('id'))
+            day_ids.add(d.get('id'))
+            for pid in d.get('patterns', []):
+                if pid not in pat_ids: errs.append('plan %s: unknown pattern %s' % (d.get('id'), pid))
+                planned.add(pid)
+            for c in d.get('tests', []):
+                if c not in A['selftests']: errs.append('plan %s: course %s has no self-test' % (d.get('id'), c))
+            if not d.get('patterns') and not d.get('text'): errs.append('plan %s needs patterns or text' % d.get('id'))
+    for pid in sorted(pat_ids - planned): warns.append('pattern %s is not in the study plan' % pid)
+    if re.match(r'^\d{4}-\d{2}-\d{2}$', plan.get('start', '')):
+        import datetime
+        s0 = datetime.date(*map(int, plan['start'].split('-'))); ex = datetime.date(*map(int, A['reg']['exam']['date'].split('-')))
+        if s0 + datetime.timedelta(days=ndays) > ex: errs.append('plan: %d days from %s run past the exam' % (ndays, plan['start']))
+    # owner's rule for website copy: no «؛ ، :» in titles, no em dash
+    for p in A['patterns']:
+        if re.search('[؛،:—]', p.get('title', '')): errs.append('%s: title has ؛ ، : or an em dash: %s' % (p['_file'], p['title']))
+    for c in A['courses']:
+        if re.search('[؛،:—]', c.get('name', '') + c.get('short', '')): errs.append('course %s name has ؛ ، : or an em dash' % c['id'])
     if A['site']['exam']['negative'].get('tool') and A['site']['exam']['negative']['tool'] not in reg_names['tool']:
         errs.append('site.json exam tool is not registered')
     # ---- answer keys (independent table) ----

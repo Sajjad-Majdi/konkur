@@ -1,7 +1,7 @@
 {
   "id": "O2",
   "course": "os",
-  "title": "همگام‌سازی: ناحیه بحرانی، سمافور و ردگیری کد همروند",
+  "title": "همگام‌سازی و ناحیه بحرانی و سمافور",
   "en": "Synchronization · critical section · semaphores · TAS / CAS · spinlock",
   "frequency": "در ۶ کنکور از ۷ کنکور ۱۳۹۹ تا ۱۴۰۵؛ ۱۳۹۹ و ۱۴۰۰ هر کدام دو سؤال",
   "rank": {

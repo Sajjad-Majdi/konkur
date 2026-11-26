@@ -4,24 +4,60 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#f3efe6">
+<meta name="theme-color" content="#f1ece1">
 <!--HEAD-->
 <title>{{TITLE}}</title>
+<script>
+/* theme before first paint: saved choice in kn1406.v1, else the system */
+(function(){var t;try{var s=JSON.parse(localStorage.getItem('kn1406.v1')||'{}');t=s&&s.theme;}catch(e){}
+if(t!=='light'&&t!=='dark'){try{t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}catch(e){t='light';}}
+document.documentElement.setAttribute('data-theme',t);})();
+</script>
 <style>
 /*FONTS*/
 /*CSS*/
 </style>
 </head>
 <body>
-<div class="bg" aria-hidden="true"><i></i><i></i><i></i></div>
-<header class="top">
-  <svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6a5ae0"/><stop offset="1" stop-color="#14a08d"/></linearGradient></defs><circle cx="16" cy="16" r="16" fill="url(#lg)"/><g fill="none" stroke="#fbf8f1" stroke-width="2" stroke-linecap="round"><circle cx="16" cy="9.5" r="2.4" fill="#fbf8f1"/><circle cx="10" cy="21.5" r="2.4" fill="#fbf8f1"/><circle cx="22" cy="21.5" r="2.4" fill="#fbf8f1"/><path d="M14.8 11.6 11.2 19.4M17.2 11.6l3.6 7.8"/></g></svg>
-  <div class="brand">{{BRAND}}<small>{{BRAND_SUB}}</small></div>
-  <button type="button" id="themeBtn" class="icon-btn" aria-label="پوسته"></button>
-</header>
-<main id="app"></main>
-<nav class="pill" id="nav" aria-label="بخش‌ها"></nav>
-<div id="sheet" class="sheet" hidden role="dialog" aria-modal="true" aria-label="آزمونک"></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<symbol id="i-home" viewBox="0 0 24 24"><path d="M3.5 10.5 12 3.5l8.5 7V20a1 1 0 0 1-1 1H15v-6H9v6H4.5a1 1 0 0 1-1-1z"/></symbol>
+<symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v14.5H6.5A2.5 2.5 0 0 0 4 20z"/><path d="M4 20a1.5 1.5 0 0 0 1.5 1H20v-3.5"/></symbol>
+<symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4"/><path d="M5 4h12l-2.5 4.5L17 13H5"/></symbol>
+<symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2.5 12h2M19.5 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+<symbol id="i-chl" viewBox="0 0 24 24"><path d="M14.5 5.5 8 12l6.5 6.5"/></symbol>
+<symbol id="i-chr" viewBox="0 0 24 24"><path d="M9.5 5.5 16 12l-6.5 6.5"/></symbol>
+<symbol id="i-chd" viewBox="0 0 24 24"><path d="M6 9.5l6 6 6-6"/></symbol>
+<symbol id="i-arl" viewBox="0 0 24 24"><path d="M19 12H5.5M11 6l-6 6 6 6"/></symbol>
+<symbol id="i-arr" viewBox="0 0 24 24"><path d="M5 12h13.5M13 6l6 6-6 6"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
+<symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3.8 2.8 19.8h18.4z"/><path d="M12 10v4.2M12 17.2v.1"/></symbol>
+<symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></symbol>
+<symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2.5 4.5 14H11l-1 7.5 8.5-11.5H12z"/></symbol>
+<symbol id="i-ext" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-8.5 8.5"/><path d="M18.5 14v5a1 1 0 0 1-1 1h-12a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></symbol>
+<symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6"/></symbol>
+<symbol id="i-mark" viewBox="0 0 24 24"><path d="M6.5 3.5h11v17L12 16.5l-5.5 4z"/></symbol>
+<symbol id="i-tool" viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/></symbol>
+<symbol id="i-retry" viewBox="0 0 24 24"><path d="M4.5 12a7.5 7.5 0 1 0 2.3-5.4"/><path d="M4.5 4.5V9H9"/></symbol>
+<symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z"/></symbol>
+<symbol id="i-wifioff" viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M8.6 16.3a4.8 4.8 0 0 1 6.8 0M5.2 12.8a9.6 9.6 0 0 1 4.7-2.5M18.8 12.8a9.6 9.6 0 0 0-2-1.5M2 9.3a14.4 14.4 0 0 1 4.3-2.8M22 9.3A14.4 14.4 0 0 0 11.2 5"/><path d="M12 19.8v.1"/></symbol>
+<symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"/></symbol>
+<symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></symbol>
+<symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9.2 18h5.6M10.2 21h3.6M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1 2v.2h5.2v-.2c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/></symbol>
+<symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M9.6 9.6a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.6M12 16.8v.1"/></symbol>
+<symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6.5h11M9 12h11M9 17.5h11M4.5 6.5h.1M4.5 12h.1M4.5 17.5h.1"/></symbol>
+<symbol id="i-steps" viewBox="0 0 24 24"><path d="M4 18h5v-5h5V8h6"/></symbol>
+</svg>
+<div class="app" id="app">
+  <aside class="side" id="side" aria-label="ناوبری"></aside>
+  <main id="main"></main>
+  <nav class="pill" id="pill" aria-label="ناوبری"></nav>
+</div>
+<div id="layer"></div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+<noscript><p style="padding:24px">این دفترچه بدون جاوااسکریپت کار نمی‌کند</p></noscript>
 <script>
 /*JS*/
 </script>

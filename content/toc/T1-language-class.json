@@ -1,7 +1,7 @@
 {
   "id": "T1",
   "course": "toc",
-  "title": "تشخیص نوع زبان: منظم، مستقل از متن یا حساس به متن",
+  "title": "تشخیص نوع زبان",
   "en": "Regular vs context-free vs context-sensitive · pumping",
   "frequency": "در ۵ کنکور از ۶ کنکور ۱۴۰۰ تا ۱۴۰۵ آمده",
   "rank": {

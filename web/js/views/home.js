@@ -1,72 +1,157 @@
-/* views/home: map page — progress rings, registration reminder, exam countdown, course map, weights, ranking, plan, sources */
-function liveNames(key){return LIVE.map(function(c){return key==='short'?cShort(c.id):c.name;}).join(' و ');}
-function planText(d){if(d.t)return d.t;return d.p.map(function(id){return PAT[id].t;}).join(' و ')+(d.x?' '+d.x:'');}
-function regHTML(){
-  var R=EXAM.registration,H=SITE.home.countdown;if(!R)return '';
-  var now=nowDate().getTime(),end=tehranDayEnd(R.end),toStart=daysUntil(R.start);
-  if(now>=end)return '';
-  var link='<a class="btn reg-a" href="'+esc(R.url)+'" target="_blank" rel="noopener">'+H.regLink+' <bdi class="u">'+esc(R.urlLabel||R.url)+'</bdi></a>';
-  if(toStart>0){
-    return '<section class="card reg soon" aria-live="polite"><div class="reg-h">'+IC.clock+'<b>'+H.regSoonTitle+'</b></div>'+
-      '<div class="reg-row"><div class="reg-n"><b>'+fa(toStart)+'</b><span>'+H.regSoonLeft+'</span></div><p class="reg-d">'+faRange(R.start,R.end)+'</p></div>'+link+'</section>';
+/* views/home: "today" page — today's work card, exam countdown, registration reminder, this week, wrong answers, progress */
+const phLbl = d => { if (!d || d.ph < 0) return '<span class="dayn">الگوی بعدی</span>'; const ph = PHASES[d.ph]; return `<span class="dayn">${esc(ph.short)}</span><span>روز ${fa(d.n - ph.from + 1)} از ${fa(ph.len)}</span>`; };
+const whenLbl = n => n === todayN() + 1 ? 'فردا' : jdate(dateOf(n), { w: 1 });
+const itemLbl = d => d.pats.length ? d.pats.map(id => PAT[id].t).join(' و ') : d.text;
+function hero(m) {
+  const w = weak();
+  if (m.kind === 'plandone') {
+    return `<section class="card hero fin">
+      <div class="hero-k"><span class="hd">${jdate(TODAY, { w: 1 })}</span><span class="dayn">برنامه</span><span>${ic('check', 's')} همه مرحله‌ها تمام شد</span></div>
+      <h2><span class="mk">هر ${fa(RANK.length)} الگو تمام شد</span></h2>
+      <div class="hero-a">${LIVE.filter(c => SELFTEST[c.id]).map((c, i) => `<a class="btn l ${i ? 'ghost' : ''} tap c-${c.id}" href="#/t/${c.id}">${ic('play', 's')}آزمونک ${esc(cShort(c.id))}</a>`).join('')}</div></section>`;
   }
-  var ms=end-now,dd=Math.floor(ms/864e5),hh=Math.floor((ms%864e5)/36e5);
-  var left=dd?fa(dd)+' روز'+(hh?' و '+fa(hh)+' ساعت':''):(hh?fa(hh)+' ساعت':'کمتر از یک ساعت');
-  var e=parseISO(R.end),je=g2j(e[0],e[1],e[2]);
-  return '<section class="card reg open" aria-live="polite"><div class="reg-h">'+IC.clock+'<b>'+H.regOpenTitle.replace('{end}',fa(je[2])+' '+JMON[je[1]-1])+'</b></div>'+
-    '<div class="reg-row"><div class="reg-n"><b>'+left+'</b><span>'+H.regOpenLeft+'</span></div><p class="reg-d">'+faRange(R.start,R.end)+'</p></div>'+link+'</section>';
+  if (m.kind === 'daydone') {
+    const nx = m.next, np = nx.pats.length ? PAT[nx.pats.filter(id => !pst(id).done)[0] || nx.pats[0]] : null;
+    const go = np ? `#/p/${np.id}` : '#/plan';
+    return `<section class="card hero fin ${np ? 'c-' + np.c : ''}">
+      <div class="hero-k"><span class="hd">${jdate(TODAY, { w: 1 })}</span>${phLbl(m.d)}</div>
+      <h2><span class="mk">کار امروز تمام شد</span></h2>
+      <div class="next-l">${whenLbl(nx.n)} · ${esc(itemLbl(nx))}</div>
+      <div class="hero-a">${w.length ? `<a class="btn l tap" href="#/q/${w[0]}">${ic('retry', 's')}حل دوباره ${fa(w.length)} سوال غلط</a><a class="btn l ghost tap" href="${go}">جلوتر برو${ic('arl', 's')}</a>`
+        : `<a class="btn l tap" href="${go}">جلوتر برو${ic('arl', 's')}</a>`}</div></section>`;
+  }
+  const lagTx = m.behind ? `<span class="lag">از ${jdate(dateOf(m.behind))} مانده</span>` : '';
+  if (m.kind === 'text') {
+    const d = m.d, link = testBtns(d) || (w.length ? `<a class="btn l ghost tap" href="#/q/${w[0]}">${ic('retry', 's')}${fa(w.length)} سوال غلط</a>` : '');
+    return `<section class="card hero">
+      <div class="hero-k"><span class="hd">${jdate(TODAY, { w: 1 })}</span>${phLbl(d)}${lagTx}</div>
+      <h2><span class="mk">${esc(d.text)}</span></h2>
+      <div class="hero-a"><button class="btn l tap" data-act="text-done" data-d="${d.id}">${ic('check', 's')}انجام شد</button>${link}</div></section>`;
+  }
+  const p = PAT[m.pid], s = m.st || pst(m.pid), d = m.d;
+  const st = k => ({ read: s.read, ex: s.ex, pr: s.ans === s.tot && s.tot > 0 }[k]);
+  const cur = s.stage;
+  const stages = ['read', 'ex', 'pr'].map((k, i) => {
+    const done = st(k), on = cur === k;
+    const lbl = k === 'pr' ? `تمرین ${fa(s.ans)} از ${fa(s.tot)}` : STG[k];
+    return `${i ? `<i class="stg-l ${done || on ? 'done' : ''}"></i>` : ''}<span class="stg ${done ? 'done' : on ? 'cur' : ''}"><span class="b">${done ? ic('check', 's') : fa(i + 1)}</span>${lbl}</span>`;
+  }).join('');
+  const target = cur === 'pr' ? `#/p/${p.id}/q/${Math.max(0, p.pr.findIndex(q => !answered(q)))}` : cur === 'done' ? `#/p/${p.id}` : `#/p/${p.id}/${cur}`;
+  const label = m.kind === 'start' ? 'شروع با یادآوری' : `ادامه · ${STG[cur] || 'مرور'}`;
+  const other = d.pats.filter(x => x !== p.id && !pst(x).done).map(x => PAT[x]);
+  const also = other.length || d.extra ? `<div class="also">${other.length ? `${ic('list', 's')}بعد از این <a href="#/p/${other[0].id}">${esc(other[0].t)}</a>` : ''}${d.extra ? `${other.length ? ' · ' : ''}${esc(d.extra)}` : ''}</div>` : '';
+  return `<section class="card hero c-${p.c}">
+    <div class="hero-k"><span class="hd">${jdate(TODAY, { w: 1 })}</span>${phLbl(d)}${lagTx}<span class="tag"><i class="dot"></i>${esc(cShort(p.c))}</span></div>
+    <h2><a href="#/p/${p.id}"><span class="mk">${esc(p.t)}</span></a></h2>
+    <div class="en">${esc(p.en)}</div>
+    ${also}
+    <div class="stages">${stages}</div>
+    <div class="hero-a"><a class="btn l tap" href="${target}">${label}${ic('arl', 's')}</a>
+      <div class="meta"><span>${ic('clock', 's')}${hours(p.rank.hours)}</span><span>${freq(p, true)}</span></div></div></section>`;
 }
-function countdownHTML(){
-  var H=SITE.home.countdown,n=daysUntil(EXAM.date),big,label;
-  if(n>0){big='<b>'+fa(n)+'</b><span>'+H.days+'</span>';label=H.title;}
-  else if(n===0){big='<b>'+fa(0)+'</b><span>'+H.days+'</span>';label=H.today;}
-  else {big='';label=H.past;}
-  return '<section class="card cdcard"><div class="cd">'+(big?'<div class="cd-n">'+big+'</div>':'')+'<div class="cd-t"><b>'+label+'</b><span>'+faDate(EXAM.date,true)+'</span><small>'+EXAM.dayNote+'</small></div></div></section>';
-}
-function refreshDates(){var r=$('#homeReg'),c=$('#homeCd');if(r)r.innerHTML=regHTML();if(c)c.innerHTML=countdownHTML();}
-function courseMapHTML(){
-  var H=SITE.home.courses,h='<section class="card"><h2>'+H.title+'</h2><p class="lead">'+H.lead+'</p>';
-  GROUPS.forEach(function(g){
-    var cs=COURSES.filter(function(c){return c.group===g.id;});
-    h+='<div class="cg"><div class="cg-h"><b>'+g.name+'</b><span>ضریب '+fa(g.coef)+'</span></div><div class="cgrid">'+cs.map(function(c){
-      if(c.hasContent){var st=courseStats(c.id);return '<button type="button" class="cc live '+c.id+'" data-go="'+c.id+'"><span class="cc-i">'+(IC[c.icon]||IC.book)+'</span><span class="cc-t"><b>'+c.name+'</b><small class="cst" data-c="'+c.id+'" data-u="تمرین">'+fa(st.done)+' از '+fa(st.n)+' تمرین</small></span></button>';}
-      return '<div class="cc soon" aria-disabled="true"><span class="cc-i">'+IC.lock+'</span><span class="cc-t"><b>'+c.name+'</b><small>'+H.soon+'</small></span></div>';
-    }).join('')+'</div></div>';
+function timeline(ts) {
+  const total = ts.toExam; if (total <= 0) return '';
+  const pct = i => (i / total * 100).toFixed(2);
+  const bounds = [0];
+  for (let i = 1; i < total; i++) if (jp(ts.t + i * DAY)[2] === 1) bounds.push(i);
+  bounds.push(total);
+  let ticks = '', mos = '';
+  bounds.forEach((b, k) => {
+    if (k && k < bounds.length - 1) ticks += `<i class="tick" style="inset-inline-start:${pct(b)}%"></i>`;
+    if (k < bounds.length - 1 && (bounds[k + 1] - b) / total > .075) mos += `<span class="mo" style="inset-inline-start:${pct((b + bounds[k + 1]) / 2)}%">${JMON[jp(ts.t + b * DAY)[1] - 1]}</span>`;
   });
-  return h+'</section>';
+  let reg = '';
+  if (['before', 'open', 'last', 'done'].includes(ts.reg)) {
+    const a = Math.max(0, dd(ts.t, REG_S)), b = dd(ts.t, REG_E) + 1;
+    reg = `<i class="reg" style="inset-inline-start:${pct(a)}%;width:${(Math.max(b - a, 1.6) / total * 100).toFixed(2)}%;${ts.reg === 'done' ? 'opacity:.35' : ''}" title="ثبت‌نام"></i>`;
+  }
+  return `<div class="tl" aria-hidden="true"><i class="bar"></i>${ticks}${reg}<i class="now" style="inset-inline-start:0"></i><span class="end">${ic('flag', 's')}</span>${mos}</div>`;
 }
-function weightsHTML(){
-  var Wt=SITE.home.weights,gs=GROUPS.slice().sort(function(a,b){return a.coef-b.coef;});
-  var focusG=null;gs.forEach(function(g){if(LIVE.some(function(c){return c.group===g.id;}))focusG=g;});
-  var h='<section class="card wcard"><h2>'+Wt.title+'</h2><div class="wbar" aria-hidden="true">';
-  gs.forEach(function(g){h+='<span class="'+(g===focusG?'ws':'wm')+'" style="flex:'+g.coef+'">'+(g===focusG?'<i style="width:'+(Wt.focus.questions/g.approxQuestions*100).toFixed(1)+'%"></i>':'')+'</span>';});
-  h+='</div><div class="wrows">';
-  gs.forEach(function(g){
-    h+='<div class="wr"><span class="sw '+(g===focusG?'ws':'wm')+'"></span><b>'+g.name+'</b><span>ضریب '+fa(g.coef)+'</span><span class="muted">حدود '+fa(g.approxQuestions)+' سوال</span></div>';
-    if(g===focusG)h+='<div class="wr sub"><span class="sw wgr"></span><b>'+Wt.focus.name+'</b><span>'+Wt.focus.label+'</span><span class="muted">حدود '+fa(Wt.focus.questions)+' سوال</span></div>';
-  });
-  h+='</div><div class="focus"><b class="big">'+Wt.big+'</b><span>'+Wt.bigText+'<br><small>'+Wt.bigSmall+'</small></span></div>'+
-    '<ul class="facts">'+Wt.facts.map(function(f){return '<li>'+f+'</li>';}).join('')+'</ul><p class="src">'+Wt.source+'</p></section>';
-  return h;
+const regRange = () => { const a = jp(REG_S), b = jp(REG_E); return a[1] === b[1] ? `${fa(a[2])} تا ${fa(b[2])} ${JMON[b[1] - 1]}` : `${jdate(REG_S)} تا ${jdate(REG_E)}`; };
+function timePanel(ts, o = {}) {
+  if (ts.toExam < 0) return `<section class="card time"><div class="k">کنکور ${fa(EXAM.year)}</div><div class="n"><b style="font-size:34px">برگزار شد</b></div><div class="dt">${jdate(EXAMD, { w: 1, y: 1 })}</div></section>`;
+  if (ts.toExam === 0) return `<section class="card time today-x"><div class="k">کنکور ${fa(EXAM.year)}</div><div class="n"><b style="font-size:34px">امروز روز کنکور است</b></div><div class="dt">سه دور حل و هر سه غلط یک درست را پاک می‌کند</div></section>`;
+  let row = '';
+  if (ts.reg === 'before') row = `<div class="reg-row"><i class="sq"></i><span><b>ثبت‌نام</b> ${regRange()}</span><span class="x">${ts.toReg === 1 ? 'فردا' : fa(ts.toReg) + ' روز دیگر'}</span></div>`;
+  if (o.withReg && (ts.reg === 'open' || ts.reg === 'last')) row = `<a class="reg-row open tap" href="${esc(EXAM.registration.url)}" target="_blank" rel="noopener" data-act="reg-link"><i class="sq"></i><span><b>${ts.reg === 'last' ? 'امروز روز آخر ثبت‌نام' : 'ثبت‌نام باز است'}</b></span><span class="x">${ts.reg === 'last' ? ic('ext', 's') : fa(ts.regLeft) + ' روز مانده'}</span></a>`;
+  if (ts.reg === 'done') row = `<div class="reg-row" style="color:var(--ink-3)">${ic('check', 's')}<span>ثبت‌نام انجام شد</span></div>`;
+  return `<section class="card time">
+    <div class="k">تا کنکور ${fa(EXAM.year)}</div>
+    <div class="n"><b>${fa(ts.toExam)}</b><span>روز</span></div>
+    <div class="dt">${jdate(EXAMD, { w: 1, y: 1 })}</div>
+    ${timeline(ts)}${row}</section>`;
 }
-function rankHTML(){
-  var Rk=SITE.home.rank,ps=PATTERNS.filter(function(p){return p.rank;}).sort(function(a,b){return a.rank.order-b.rank.order;});
-  return '<section class="card"><h2>'+Rk.title+'</h2><p class="lead">'+Rk.lead+'</p><ol class="rank">'+
-    ps.map(function(p,j){var r=p.rank;return '<li><button type="button" class="rk '+p.c+'" data-go="'+p.c+'/'+p.id+'"><span class="rn">'+fa(j+1)+'</span><span class="rt">'+p.t+'<small>'+cShort(p.c)+'</small></span><span class="rf"><span>'+(r.repeat.indexOf(' از ')>0?'تکرار '+r.repeat:r.repeat)+'</span><span>'+fa(r.hours)+' ساعت</span></span></button></li>';}).join('')+'</ol></section>';
+function regBanner(ts) {
+  if (ts.reg !== 'open' && ts.reg !== 'last') return '';
+  const last = ts.reg === 'last';
+  return `<section class="reg-banner ${last ? 'last' : ''}" role="alert">
+    <span class="big">${last ? ic('alert', 'l') : fa(ts.regLeft)}</span>
+    <div class="tx"><b>${last ? `امروز آخرین روز ثبت‌نام کنکور ${fa(EXAM.year)} است` : `ثبت‌نام کنکور ${fa(EXAM.year)} باز است`}</b><span>${last ? 'تا پایان امروز ' + jdate(REG_E) : `روز مانده تا ${jdate(REG_E)}`}</span></div>
+    <div class="acts"><a class="btn amber tap" href="${esc(EXAM.registration.url)}" target="_blank" rel="noopener" data-act="reg-link">ثبت‌نام در سنجش ${ic('ext', 's')}</a><button class="btn ghost tap" data-act="reg-done">ثبت‌نام کردم</button></div></section>`;
 }
-function planHTML(){
-  var Pl=SITE.home.plan,wk=[],h;
-  for(var w=1;w<=Pl.weeks;w++)wk.push(w);
-  h='<section class="card"><div class="ch2"><h2>'+Pl.title+'</h2>'+seg(wk.map(function(w){return [w,'هفته '+fa(w)];}),S.week||1,'weeks')+'</div><div class="plan">';
-  wk.forEach(function(w){h+='<ul class="pl'+((S.week||1)===w?' on':'')+'" data-w="'+w+'">'+PLAN.filter(function(d){return d.w===w;}).map(function(d){var on=!!S.plan[d.id];return '<li><button type="button" class="prow'+(on?' on':'')+'" data-p="'+d.id+'" aria-pressed="'+on+'"><span class="pcb">'+IC.check+'</span><span class="pd">روز '+fa(d.id.slice(1))+'</span><span class="ptx">'+planText(d)+'</span></button></li>';}).join('')+'</ul>';});
-  return h+'</div></section>';
+/* ---- plan pieces shared with the plan page: day cell, week strip ---- */
+const WDS = ['شنبه', 'یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه', 'جمعه'];
+const WD1 = ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
+const colOf = t => (new Date(t).getUTCDay() + 1) % 7;
+function dayInfo(t) {
+  const n = nOf(t), d = n >= 1 && n <= LP.length ? LP[n - 1] : null;
+  const isT = t === TODAY, past = t < TODAY, done = d && dayDone(d);
+  return { t, n, d, isT, past, done, miss: past && d && !d.soon && !done, buf: n > LP.length && t < EXAMD, exam: t === EXAMD, reg: t >= REG_S && t <= REG_E, pre: n < 1 };
 }
-function homeHTML(){
-  var H=SITE.home;
-  var h='<section class="hero"><h1>'+H.title+'</h1><p class="sub">'+liveNames()+'<br><span>'+H.subtitle+'</span></p>'+
-    '<div class="hrings">'+LIVE.map(function(c){var st=courseStats(c.id);return '<button type="button" class="hrc '+c.id+'" data-go="'+c.id+'">'+ringSvg(frac(st),c.id)+'<span><b>'+cShort(c.id)+'</b><small class="cst" data-c="'+c.id+'" data-u="تمرین">'+fa(st.done)+' از '+fa(st.n)+' تمرین</small></span></button>';}).join('')+'</div></section>';
-  h+='<div id="homeReg">'+regHTML()+'</div><div id="homeCd">'+countdownHTML()+'</div>';
-  h+=courseMapHTML()+weightsHTML()+rankHTML()+planHTML();
-  h+='<section class="card"><h2>'+H.sources.title+'</h2><ul class="srcs">'+H.sources.items.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul><p class="src">'+H.sources.note+'</p></section>';
-  return h;
+function dayCell(t, mode) {
+  const x = dayInfo(t), d = x.d, ph = d ? PHASES[d.ph] : null, jd = jp(t)[2];
+  const cls = ['dc', x.isT ? 'today' : '', x.done ? 'done' : '', x.miss ? 'miss' : '', x.pre ? 'pre' : '', x.buf ? 'buf' : '', x.exam ? 'exam' : '', ph && ph.soon ? 'ph-soon' : '', d && d.soon ? 'soon' : ''].join(' ');
+  const mark = x.done ? ic('check', 's') : x.isT ? '<em>امروز</em>' : x.miss ? '<i class="lagdot" title="عقب"></i>' : '';
+  let body = '';
+  if (d) {
+    if (d.soon) body = `<div class="sn">${esc(ph.short)}</div>`;
+    else body = d.pats.map(id => `<div class="pt c-${PAT[id].c} ${!x.done && pst(id).done ? 'pd' : ''}">${!x.done && pst(id).done ? ic('check', 's') : ''}${esc(PAT[id].t)}</div>`).join('') + (d.text ? `<div class="tx">${esc(d.text)}</div>` : '');
+  } else if (x.exam) body = `<div class="tx ex-d">${ic('flag', 's')}کنکور</div>`;
+  else if (x.buf) body = '<div class="sn">ذخیره</div>';
+  if (x.reg) body += '<div class="rg">ثبت‌نام</div>';
+  const dots = d && !d.soon ? (d.pats.length ? d.pats.map(id => `<i class="c-${PAT[id].c} ${pst(id).done ? 'pd' : ''}"></i>`).join('') : '<i class="nt"></i>') : x.reg ? '<i class="rgd"></i>' : '';
+  const href = d && d.pats.length ? `#/p/${(d.pats.find(id => !pst(id).done) || d.pats[0])}` : d && d.tests ? `#/t/${d.tests[0]}` : '';
+  const head = mode === 'week' ? `<span class="wd"><b class="lg">${WDS[colOf(t)]}</b><b class="sm">${WD1[colOf(t)]}</b> ${fa(jd)}</span>` : `<span class="wd"><b>${fa(jd)}</b></span>`;
+  const tag = href ? 'a' : 'div';
+  return `<${tag} class="${cls} ${href ? 'tap' : ''}" ${href ? `href="${href}"` : ''} style="--pc:${ph ? ph.bar : x.buf ? 'var(--amber-2)' : 'transparent'}"><div class="dn">${head}${mark}</div><div class="dots">${dots}</div><div class="bd">${body}</div></${tag}>`;
+}
+function weekStrip() {
+  const sat = TODAY - colOf(TODAY) * DAY, k = todayN(), lag = missed().length;
+  return `<section class="panel plan">
+    <div class="plan-h"><h2 class="h2">این هفته</h2><span class="x">${k >= 1 && k <= LP.length ? `روز ${fa(k)} از ${fa(LP.length)}` : k < 1 ? 'برنامه هنوز شروع نشده' : 'روزهای ذخیره'}${lag ? ` · <b style="color:var(--amber)">${fa(lag)} روز عقب</b>` : ''}</span>
+      <a class="lnk tap" href="#/plan" style="margin-inline-start:auto">برنامه کامل تا کنکور${ic('chl', 's')}</a></div>
+    <div class="days wk">${Array.from({ length: 7 }, (_, i) => dayCell(sat + i * DAY, 'week')).join('')}</div></section>`;
+}
+function weakRow(qid) {
+  const q = Q[qid];
+  return `<a class="wrow tap c-${q.c}" href="#/q/${qid}"><span class="ix">${ic('x', 's')}</span><span class="bd"><span class="t1">${esc(wTitle(qid))}<small>${qref(q)}${fromTest(qid) && q.pat ? ' · از آزمونک' : ''}</small></span><span class="t2">${plain(q.t)}</span></span><span class="go">دوباره حل کن ${ic('arl', 's')}</span></a>`;
+}
+function weakPanel(w) {
+  const pats = [...new Set(w.map(q => wTitle(q)))];
+  return `<section class="panel weak">
+    <div class="sec-t">${ic('retry')}<h2 class="h2">سوال‌های غلط</h2><span class="x">${fa(w.length)} سوال</span></div>
+    <button class="wrow weak-m tap c-${Q[w[0]].c}" data-act="weak-sheet"><span class="ix">${ic('retry', 's')}</span><span class="bd"><span class="t1">${fa(w.length)} سوال غلط</span><span class="t2">${esc(pats[0])}${pats.length > 1 ? ` و ${fa(pats.length - 1)} مورد دیگر` : ''}</span></span><span class="go">دوباره حل کن ${ic('arl', 's')}</span></button>
+    ${w.slice(0, 4).map(weakRow).join('')}
+    ${w.length > 4 ? `<button class="lnk tap" data-act="weak-sheet" style="padding:8px 12px">همه ${fa(w.length)} سوال ${ic('chl', 's')}</button>` : ''}</section>`;
+}
+function progPanel() {
+  const dn = RANK.filter(id => pst(id).done).length;
+  const rows = LIVE.map(c => {
+    const s = cst(c.id);
+    return `<a class="prow tap c-${c.id}" href="#/c/${c.id}"><span class="nm"><i class="dot"></i>${esc(c.name)}</span><span class="ct">${fa(s.done)} از ${fa(s.n)} الگو</span>${segbar(c.id)}
+      <div class="sub"><span>${s.ans ? `${fa(s.right)} از ${fa(s.ans)} درست در بار اول` : 'هنوز سوالی حل نشده'}</span><span>${s.left ? hours(s.left) + ' مانده' : 'تمام'}</span></div></a>`;
+  }).join('');
+  const soon = COURSES.filter(c => !c.hasContent).length;
+  return `<section class="panel prog"><div class="sec-t"><h2 class="h2">پیشرفت</h2><span class="x">${fa(dn)} از ${fa(RANK.length)} الگو</span></div>${rows}
+    ${soon ? `<a class="soon-l tap" href="#/courses">${fa(soon)} درس دیگر به‌زودی ${ic('chl', 's')}</a>` : ''}</section>`;
+}
+function vHome() {
+  const ts = timeState(), w = weak();
+  return `<div class="view wrap home">
+    ${tb('', 'امروز', themeBtn(), jdate(TODAY, { w: 1 }))}
+    ${regBanner(ts)}
+    <div class="top">${hero(heroModel())}${timePanel(ts)}</div>
+    ${weekStrip()}
+    <div class="lower ${w.length ? '' : 'one'}">${w.length ? weakPanel(w) : ''}${progPanel()}</div>
+  </div>`;
 }

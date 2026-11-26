@@ -1,7 +1,7 @@
 {
   "id": "O1",
   "course": "os",
-  "title": "زمان‌بندی پردازنده: گانت، میانگین انتظار و بی‌درنگ",
+  "title": "زمان‌بندی پردازنده و نمودار گانت",
   "en": "CPU scheduling · Gantt chart · RR · priority · MLFQ · Rate Monotonic",
   "frequency": "در ۶ کنکور از ۷ کنکور ۱۳۹۹ تا ۱۴۰۵؛ پرتکرارترین مبحث سیستم عامل",
   "rank": {

@@ -38,3 +38,12 @@ function faRange(a,b){
   if(ja[0]===jb[0]&&ja[1]===jb[1])return fa(ja[2])+' تا '+fa(jb[2])+' '+JMON[jb[1]-1]+' '+fa(jb[0]);
   return faDate(a)+' تا '+faDate(b);
 }
+/* day arithmetic in UTC milliseconds of a calendar day (as the design mockup) */
+var DAY=864e5;
+function ymd(iso){var g=parseISO(iso);return Date.UTC(g[0],g[1]-1,g[2]);}
+function isoOf(t){return new Date(t).toISOString().slice(0,10);}
+function dd(a,b){return Math.round((b-a)/DAY);}
+function todayMs(){var g=tehranToday();return Date.UTC(g[0],g[1]-1,g[2]);}
+function jp(t){var d=new Date(t);return g2j(d.getUTCFullYear(),d.getUTCMonth()+1,d.getUTCDate());}
+/* "۵ آذر", with o.y the year, with o.w the weekday first */
+function jdate(t,o){o=o||{};var j=jp(t),s=fa(j[2])+' '+JMON[j[1]-1];if(o.y)s+=' '+fa(j[0]);if(o.w)s=WDAY[new Date(t).getUTCDay()]+' '+s;return s;}

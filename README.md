@@ -15,8 +15,8 @@ build.py                 builds everything (plain Python 3, no packages)
 tools/verify.py          all checks; build.py runs them, or run it alone
 content/
   courses.json           exam info + every course of the exam (registry)
-  site.json              page texts (home, exam day)
-  plan.json              study plan (days -> patterns)
+  site.json              page texts (exam day; older home texts kept)
+  plan.json              study plan to the exam: phases -> days (see below)
   <course>/<ID>-<slug>.json   one file per pattern, with its questions
   <course>/selftest.json      self-test question list (+ questions used only there)
   img/<course>/*.webp    images used by pattern reviews (optional)
@@ -24,11 +24,11 @@ keys/answer-keys.json    answer keys, kept apart from the content
 fonts/                   Vazirmatn (SIL Open Font License 1.1)
 web/
   template.html, style.css
-  js/core/               helpers, storage, math renderer, icons, dates, registries
-  js/components/         question card, pattern section, self-test, rings, widgets
+  js/core/               helpers, storage (+ migration), math renderer, icons, dates, registries, plan/progress model
+  js/components/         shared pieces (rings, method card, options, steps, review blocks), tool widgets
   js/tools/              one file per interactive tool / figure / table
-  js/views/              home (map), course page, exam-day page
-  js/boot/               navigation, routing, theme, start-up
+  js/views/              today, plan, courses + course, pattern, practice, self-test + result, exam day
+  js/boot/               sidebar + phone bar, hash router (#/, #/plan, #/c/<id>, #/p/<id>, #/p/<id>/q/<n>, #/q/<qid>, #/t/<id>, #/exam), actions, theme, offline
 docs/                    build output for GitHub Pages (commit this folder)
 ```
 
@@ -70,8 +70,25 @@ questions per course and per year, keys checked, tools, image sizes.
 3. Add every question id and its key to `keys/answer-keys.json` (`expected`).
 4. Run `python build.py`.
 
-Navigation, the home map, the course page and the exam-structure card are all generated from the registry.
-A course without content shows as a «به‌زودی» card and gets no page.
+The sidebar, the courses page, the course page and the exam-structure card are all generated from the registry.
+A course without content shows as «به‌زودی» and gets no page. Give its plan phase real days (below) once it has content.
+
+## Study plan (`content/plan.json`)
+
+```json
+{ "start": "2026-11-26",
+  "phases": [
+    { "id": "p1", "name": "هوش مصنوعی و ساختمان داده", "short": "هوش و ساختمان داده", "courses": ["ai", "ds"],
+      "days": [ { "id": "d1", "patterns": ["A1", "A6"] }, { "id": "d2", "patterns": ["A2"], "extra": "با ابزار هیوریستیک" },
+                { "id": "d14", "text": "آزمونک هوش مصنوعی و آزمونک ساختمان داده", "tests": ["ai", "ds"] } ] },
+    { "id": "p3", "name": "مبانی کامپیوتر و برنامه‌سازی", "short": "مبانی", "courses": ["basics"], "soon": 14 },
+    { "id": "p8", "name": "جمع‌بندی و آزمون کامل", "short": "جمع‌بندی", "final": true, "days": [ ... ] } ] }
+```
+
+One entry per calendar day from `start`. A day is done when its patterns are done, or (a day without patterns) when the
+reader taps «انجام شد». `soon: N` holds N days for a course without content. The reader's own start date and the days
+moved forward («N روز جلو ببر») live in the browser (`ps`, `sh` in `kn1406.v1`). The build checks ids, patterns,
+self-tests and that the plan ends before the exam, and warns about patterns that are not in the plan.
 
 ## Add a pattern
 
@@ -114,7 +131,8 @@ Fields:
 
 - Text fields may hold `$...$` math (a small TeX subset: `\frac`, `\sqrt`, `^`, `_`, `\log`, Greek letters, relations)
   and small HTML (`<br>`, `<b>`, `<small>`).
-- `rank` (optional): position in the home page list "most marks per hour".
+- `rank`: study order of the pattern (`order`, across all courses), how often it came (`repeat`, e.g. «۴ از ۵») and study `hours`.
+- `title`: no «؛ ، :» and no em dash (the build checks it); details go in `en`.
 - `review` (optional): the «یادآوری» box shown first in the pattern, open until the reader closes it.
   Blocks: `text` (`html`), `img` (`src` under `content/img/<course>/`, `alt`, optional `caption`),
   `svg` (`name` of a registered figure, optional `caption`). In `docs/` images are separate cached files;

@@ -7,6 +7,10 @@ Outputs
 Usage: python build.py            (fails on any content or answer-key error)
 """
 import base64, glob, hashlib, io, json, os, re, shutil, struct, sys, zlib
+try:
+    sys.stdout.reconfigure(encoding="utf-8"); sys.stderr.reconfigure(encoding="utf-8")
+except Exception:
+    pass
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(ROOT, 'tools'))
@@ -67,30 +71,43 @@ def runtime_data(A, img_url):
     for c, s in A['selftests'].items():
         for x in s.get('questions', []): Q[x['id']] = q(x)
         st[c] = s['ids']
-    plan = []
-    for d in A['plan']['days']:
-        r = {'id': d['id'], 'w': d['week']}
+    def day(d):
+        r = {'id': d['id']}
         if d.get('patterns'): r['p'] = d['patterns']
         if d.get('extra'): r['x'] = d['extra']
         if d.get('text'): r['t'] = d['text']
-        plan.append(r)
+        if d.get('tests'): r['ts'] = d['tests']
+        return r
+    plan = {'start': A['plan']['start'], 'phases': []}
+    for ph in A['plan']['phases']:
+        r = {k: ph[k] for k in ('id', 'name', 'short', 'courses', 'soon', 'final') if k in ph}
+        if ph.get('days'): r['days'] = [day(d) for d in ph['days']]
+        plan['phases'].append(r)
     return {'site': A['site'], 'exam': A['reg']['exam'], 'groups': A['reg']['groups'], 'courses': A['courses'],
             'patterns': pats, 'q': Q, 'selftest': st, 'plan': plan}
 
 
 def course_css(courses):
+    """per-course accent: --c-<id> tokens for both themes and .c-<id> { --c, --cs } (generated from content/courses.json)"""
     light, dark, rules = [], [], []
     for c in courses:
         col, i = c.get('color'), c['id']
         if not col: continue
         light.append('--c-%s:%s;--c-%s-soft:%s' % (i, col['light'], i, col['lightSoft']))
         dark.append('--c-%s:%s;--c-%s-soft:%s' % (i, col['dark'], i, col['darkSoft']))
-        sel = ','.join(s % i for s in ('#v-%s', '.pat.%s', '.sheet.%s', '.rk.%s', '.hrc.%s', '.cc.%s'))
-        rules.append('%s{--acc:var(--c-%s);--acc-soft:var(--c-%s-soft)}' % (sel, i, i))
-        rules.append('.pill button[data-v="%s"].on{color:var(--c-%s)}' % (i, i))
+        rules.append('.c-%s{--c:var(--c-%s);--cs:var(--c-%s-soft)}' % (i, i, i))
     if not light: return ''
-    return ('\n/* generated from content/courses.json */\n:root{%s}\n@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){%s}}\n:root[data-theme="dark"]{%s}\n%s\n'
-            % (';'.join(light), ';'.join(dark), ';'.join(dark), '\n'.join(rules)))
+    return ('\n:root{%s}\n:root[data-theme="dark"]{%s}\n%s\n'
+            % (';'.join(light), ';'.join(dark), ''.join(rules)))
+
+
+def min_css(css):
+    """small safe minifier: comments, line breaks and spaces around { } ; , > and after a colon"""
+    css = re.sub(r'/\*.*?\*/', '', css, flags=re.S)
+    css = re.sub(r'\s+', ' ', css)
+    css = re.sub(r'\s*([{};,>])\s*', r'\1', css)
+    css = css.replace(': ', ':').replace(';}', '}')
+    return css.strip()
 
 
 def font_faces():
@@ -124,12 +141,10 @@ def page(A, head, img_url):
     js = '(function(){\n\'use strict\';\nvar KN_DATA=' + data + ';\n' + '\n'.join(rd(f) for f in js_sources()) + '\n})();'
     assert '</script' not in js.lower()
     check_js_syntax(js)
-    live =[c for c in A['courses'] if c.get('hasContent')]
     brand = A['site']['brand']
     tpl = rd(os.path.join(WEB, 'template.html'))
-    html = (tpl.replace('<!--HEAD-->', head).replace('{{TITLE}}', brand).replace('{{BRAND}}', brand)
-            .replace('{{BRAND_SUB}}', ' و '.join(c.get('short') or c['name'] for c in live)))
-    css = rd(os.path.join(WEB, 'style.css')) + course_css(A['courses'])
+    html = tpl.replace('<!--HEAD-->', head).replace('{{TITLE}}', brand)
+    css = min_css(rd(os.path.join(WEB, 'style.css')) + course_css(A['courses']))
     return html.replace('/*FONTS*/', font_faces()).replace('/*CSS*/', css).replace('/*JS*/', js)
 
 
@@ -241,7 +256,7 @@ def main():
     site = A['site']
     files['manifest.webmanifest'] = json.dumps({
         'name': site['brand'], 'short_name': 'کنکور ارشد', 'lang': 'fa', 'dir': 'rtl', 'start_url': './', 'scope': './',
-        'display': 'standalone', 'background_color': '#f3efe6', 'theme_color': '#f3efe6',
+        'display': 'standalone', 'background_color': '#f1ece1', 'theme_color': '#f1ece1',
         'icons': [{'src': 'icon.svg', 'sizes': 'any', 'type': 'image/svg+xml'},
                   {'src': 'icon-192.png', 'sizes': '192x192', 'type': 'image/png'},
                   {'src': 'icon-512.png', 'sizes': '512x512', 'type': 'image/png'},
@@ -272,6 +287,7 @@ def main():
     years = sorted({q['year'] for q in questions.values()})
     print('questions: %d  per course %s  per year %s' % (len(questions), by_c, {y: sum(1 for q in questions.values() if q['year'] == y) for y in years}))
     print('self-tests: %s' % {c: len(s['ids']) for c, s in A['selftests'].items()})
+    print('plan: start %s, %s' % (A['plan']['start'], ', '.join('%s %d' % (ph['short'], len(ph['days']) if ph.get('days') else ph['soon']) for ph in A['plan']['phases'])))
     print('answer keys: all %d match keys/answer-keys.json and the official 1405 key; solver checks pass' % len(questions))
     print('tools: %d %s  figures: %d  tables: %d' % (len(reg['tool']), sorted(reg['tool']), len(reg['fig']), len(reg['table'])))
     rvb = [b for p in A['patterns'] for b in (p.get('review') or [])]
