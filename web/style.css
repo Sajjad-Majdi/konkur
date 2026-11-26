@@ -575,5 +575,52 @@ pre.code{direction:ltr;text-align:left;margin:10px 0 2px;padding:10px 12px;borde
 .rvw-t{color:var(--ink);line-height:2;margin:4px 0}
 .rvw-f{margin:8px 0;padding:8px;border-radius:14px;background:var(--surface);border:1px solid var(--line);text-align:center}
 .rvw-f img{display:block;max-width:100%;height:auto;margin:0 auto;border-radius:10px}
+.rvw-f.fig{padding:6px 3px}
+.fig svg.narrow{max-width:300px}
 .rvw-f figcaption{margin-top:6px;font-size:12.5px;color:var(--ink2);line-height:1.8}
+.rvw-t h4{margin:12px 0 0;font-size:14.5px;font-weight:800;color:var(--acc);line-height:1.8}
+.rvw-b>.rvw-t:first-child h4{margin-top:2px}
+.rvw-t ul{margin:2px 0;padding-inline-start:18px}
+.rvw-t li{margin:3px 0;line-height:1.95}
+.rvw-t li::marker{color:var(--acc)}
+.rvw-t p{margin:3px 0}
+.rvw-t .tw{margin:6px 0}
+.rvw-t .dt{font-size:12.5px;line-height:1.7}
+.rvw-t .dt td.w,.rvw-t .dt th.w{white-space:normal;text-align:start;min-width:5em}
+.rvw-t code{direction:ltr;unicode-bidi:isolate;font-family:Consolas,"Cascadia Mono",Menlo,monospace;font-size:12px;background:var(--bg2);padding:1px 5px;border-radius:6px;white-space:nowrap}
+/* refresher figures (web/js/tools/rv-*.js) */
+.rf{direction:ltr;fill:var(--ink);font-size:12px}
+.rf text{unicode-bidi:plaintext;text-anchor:middle;font-family:"Segoe UI",Roboto,Arial,sans-serif}
+.rf .st{text-anchor:start}.rf .en{text-anchor:end}
+.rf-e{stroke:var(--line2);stroke-width:1.6;fill:none}
+.rf-e.on{stroke:var(--acc);stroke-width:3.2;stroke-linecap:round}
+.rf-e.dsh{stroke-dasharray:5 4}
+.rf-e.rung{stroke:var(--ink3);stroke-width:2}
+.rf-n{fill:var(--surface2);stroke:var(--ink3);stroke-width:1.5}
+.rf-n.on{fill:var(--acc-soft);stroke:var(--acc)}
+.rf-n.g{fill:var(--ok-soft);stroke:var(--ok)}
+.rf-n.c1{fill:var(--hx-soft);stroke:var(--hx);stroke-width:2}
+.rf-n.c2{fill:var(--ds-soft);stroke:var(--ds);stroke-width:2}
+.rf-n.c3{fill:var(--ex-soft);stroke:var(--ex);stroke-width:2}
+.rf .rf-l{font-size:14px;font-weight:800;fill:var(--ink)}
+.rf .rf-l.sm{font-size:13px}
+.rf .rf-s{font-size:13px;fill:var(--ink2)}
+.rf .rf-s.b{font-weight:800;fill:var(--ink)}
+.rf .rf-a{font-size:13px;font-weight:800;fill:var(--acc)}
+.rf .rf-i{font-size:11px;font-weight:700;fill:var(--ink3)}
+.rf .rf-m{font-size:16px;font-family:"Cambria Math",Cambria,"Times New Roman",serif;fill:var(--ink)}
+.rf .rf-w{font-size:13.5px;font-weight:800;fill:var(--ink2);paint-order:stroke;stroke:var(--surface);stroke-width:4px;stroke-linejoin:round}
+.rf .rf-ok{font-size:12px;font-weight:700;fill:var(--ok)}
+.rf .rf-bad{font-size:12px;font-weight:700;fill:var(--bad)}
+.rf .rf-bt{font-size:11px;font-weight:800;fill:var(--surface)}
+.rf-b1{fill:var(--acc)}.rf-b2{fill:var(--ex)}
+.rf-ct{fill:var(--acc);fill-opacity:.07;stroke:var(--acc);stroke-width:1.4}
+.rf-area{fill:var(--acc-soft)}
+.rf-curve{fill:none;stroke:var(--acc);stroke-width:2.6;stroke-linejoin:round}
+.rf-dot{fill:var(--bad)}
+.rf-ar{fill:var(--ink3)}
+.rf-p1{fill:var(--acc)}.rf-p2{fill:var(--ex)}
+.rf-ring{fill:none;stroke:var(--ink);stroke-width:1.4}
+.rf-cell{fill:var(--surface2);stroke:var(--line2);stroke-width:1.2}
+.rf-cell.on{fill:var(--acc-soft)}
 @media (max-width:380px){.cgrid,.sgrid{grid-template-columns:1fr}}

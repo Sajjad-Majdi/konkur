@@ -9,6 +9,41 @@
     "repeat": "۵ از ۵",
     "hours": 2
   },
+  "review": [
+    {
+      "type": "text",
+      "html": "<h4>قضیه اصلی (master)</h4><p>برای $T(n)=aT(n/b)+f(n)$ با $a \\ge 1$ و $b>1$، سهم برگ‌ها $n^{\\log_b a}$ است. $f$ را با آن مقایسه کن:</p><ul><li>حالت ۱: $f(n)=O(n^{\\log_b a-\\epsilon})$ برای یک $\\epsilon>0$ (کوچک‌تر به اندازه یک توان $n$) ← $T=\\Theta(n^{\\log_b a})$</li><li>حالت ۲: $f(n)=\\Theta(n^{\\log_b a})$، پس $T=\\Theta(n^{\\log_b a}\\log n)$</li><li>حالت ۳: $f(n)=\\Omega(n^{\\log_b a+\\epsilon})$ و شرط نظم $af(n/b) \\le c\\,f(n)$ برای یک $c<1$، پس $T=\\Theta(f(n))$</li></ul><p>بین حالت‌ها شکاف هست: اگر نسبت $f$ به $n^{\\log_b a}$ فقط یک لگاریتم باشد (مثل $n\\log n$ در برابر $n$) هیچ‌کدام از سه حالت برقرار نیست؛ سوال «با قضیه اصلی مستقیم حل نمی‌شود» یعنی همین</p>"
+    },
+    {
+      "type": "text",
+      "html": "<h4>حالت ۲ گسترش‌یافته</h4><p>اگر $f(n)=\\Theta(n^{\\log_b a}\\log^k n)$ باشد:</p><ul><li>$k>-1$، پس $T=\\Theta(n^{\\log_b a}\\log^{k+1} n)$؛ مثلاً $2T(n/2)+n\\log n=\\Theta(n\\log^2 n)$</li><li>$k=-1$، پس $T=\\Theta(n^{\\log_b a}\\log\\log n)$؛ مثلاً $2T(n/2)+\\frac{n}{\\log n}=\\Theta(n\\log\\log n)$</li><li>$k<-1$، پس $T=\\Theta(n^{\\log_b a})$</li></ul>"
+    },
+    {
+      "type": "svg",
+      "name": "figRvRecTree",
+      "caption": "درخت بازگشت $T(n)=2T(n/2)+n$: هر سطح جمعاً $n$ کار دارد و $\\log_2 n$ سطح هست، پس $\\Theta(n\\log n)$"
+    },
+    {
+      "type": "text",
+      "html": "<h4>درخت بازگشت در حالت کلی</h4><ul><li>سطح $i$ تعداد $a^i$ گره دارد و هر کدام هزینه $f(n/b^i)$</li><li>ارتفاع $\\log_b n$ و تعداد برگ‌ها $a^{\\log_b n}=n^{\\log_b a}$</li><li>جمع سطح‌ها رو به پایین زیاد شود ← برگ‌ها غالب‌اند (حالت ۱). ثابت بماند ← هزینه یک سطح ضرب در $\\log n$ (حالت ۲). کم شود ← ریشه غالب است (حالت ۳)</li></ul>"
+    },
+    {
+      "type": "text",
+      "html": "<h4>رابطه‌هایی که باید از حفظ باشی</h4><div class=\"tw\"><table class=\"dt\"><thead><tr><th>$T(n)=$</th><th class=\"w\">جواب</th></tr></thead><tbody><tr><th>$T(n/2)+1$</th><td class=\"w\">$\\Theta(\\log n)$ <small>جستجوی دودویی</small></td></tr><tr><th>$T(n/2)+n$</th><td class=\"w\">$\\Theta(n)$</td></tr><tr><th>$2T(n/2)+1$</th><td class=\"w\">$\\Theta(n)$ <small>پیمایش درخت</small></td></tr><tr><th>$2T(n/2)+n$</th><td class=\"w\">$\\Theta(n\\log n)$ <small>مرتب‌سازی ادغامی</small></td></tr><tr><th>$T(n-1)+1$</th><td class=\"w\">$\\Theta(n)$</td></tr><tr><th>$T(n-1)+n$</th><td class=\"w\">$\\Theta(n^2)$ <small>بدترین quicksort</small></td></tr><tr><th>$2T(n-1)+1$</th><td class=\"w\">$\\Theta(2^n)$ <small>برج هانوی</small></td></tr><tr><th>$T(n-1)+T(n-2)+1$</th><td class=\"w\">$\\Theta(\\phi^n)$ <small>فیبوناچی بازگشتی، $\\phi \\approx 1.618$</small></td></tr><tr><th>$T(\\sqrt n)+1$</th><td class=\"w\">$\\Theta(\\log\\log n)$</td></tr><tr><th>$T(n/3)+T(2n/3)+n$</th><td class=\"w\">$\\Theta(n\\log n)$</td></tr><tr><th>$T(n/5)+T(7n/10)+n$</th><td class=\"w\">$\\Theta(n)$ <small>میانه میانه‌ها</small></td></tr><tr><th>$7T(n/2)+n^2$</th><td class=\"w\">$\\Theta(n^{\\log_2 7})$ <small>استراسن، $\\log_2 7 \\approx 2.81$</small></td></tr></tbody></table></div>"
+    },
+    {
+      "type": "text",
+      "html": "<h4>تغییر متغیر</h4><p>وقتی رادیکال در رابطه است $n=2^m$ بگذار و $S(m)=T(2^m)$ بنویس. چون $\\sqrt{2^m}=2^{m/2}$، رادیکال تبدیل به تقسیم بر ۲ می‌شود</p><p>مثال: $T(n)=2T(\\sqrt n)+1$، پس $S(m)=2S(m/2)+1$، پس $S(m)=\\Theta(m)$، پس $T(n)=\\Theta(\\log n)$</p>"
+    },
+    {
+      "type": "text",
+      "html": "<h4>اکرا-بازی (Akra–Bazzi)</h4><p>برای زیرمسئله‌های با اندازه نابرابر: $T(x)=\\sum_i a_iT(b_ix)+g(x)$</p><ul><li>$p$ را طوری پیدا کن که $\\sum_i a_ib_i^{\\,p}=1$</li><li>$T(x)=\\Theta\\big(x^p(1+\\int_1^x \\frac{g(u)}{u^{p+1}}du)\\big)$</li><li>میان‌بر برای $g(x)=\\Theta(x^q)$: اگر $q<p$، پس $\\Theta(x^p)$، اگر $q=p$، پس $\\Theta(x^p\\log x)$، اگر $q>p$، پس $\\Theta(x^q)$</li><li>$g(x)=x^p\\log^k x$ با $k>-1$، پس $\\Theta(x^p\\log^{k+1}x)$ و $g(x)=x^p/\\log x$، پس $\\Theta(x^p\\log\\log x)$</li><li>مثال: $T(n)=T(n/3)+T(2n/3)+n$: با $p=1$ داریم $\\frac{1}{3}+\\frac{2}{3}=1$ و $q=p$، پس $\\Theta(n\\log n)$</li></ul>"
+    },
+    {
+      "type": "text",
+      "html": "<h4>رابطه‌های تفریقی</h4><p>برای $T(n)=aT(n-b)+f(n)$ با $f(n)=\\Theta(n^k)$:</p><ul><li>$a<1$، پس $\\Theta(n^k)$</li><li>$a=1$، پس $\\Theta(n^{k+1})$ (یعنی حدود $n/b$ بار $f$)</li><li>$a>1$، پس $\\Theta(a^{n/b})$</li><li>بعضی جزوه‌ها برای $a>1$ می‌نویسند $O(n^ka^{n/b})$ که فقط کران بالاست. مثلاً $2T(n-1)+n$ دقیقاً $2^{n+1}-n-2$ است یعنی $\\Theta(2^n)$</li></ul>"
+    }
+  ],
   "cue": [
     "یک $T(n)$ برحسب خودش",
     "شرح یک الگوریتم تقسیم و حل که باید رابطه‌اش را خودت بنویسی"
@@ -17,9 +52,9 @@
     "قضیه اصلی برای $T(n)=aT(n/b)+f(n)$ — $f$ را با $n^{\\log_b a}$ مقایسه کن<br>کوچک‌تر چندجمله‌ای ← $\\Theta(n^{\\log_b a})$ و برابر ← $\\Theta(n^{\\log_b a}\\log n)$ و بزرگ‌تر چندجمله‌ای ← $\\Theta(f(n))$",
     "اگر نسبت $f$ به $n^{\\log_b a}$ فقط یک $\\log^k n$ باشد قضیه اصلی ساده جواب نمی‌دهد و نسخه گسترش‌یافته $\\Theta(n^{\\log_b a}\\log^{k+1} n)$ را می‌دهد",
     "ریشه در رابطه — با $n=2^m$ رابطه $T(\\sqrt n)$ تبدیل به $S(m/2)$ می‌شود",
-    "جمع اندازه‌ها برابر $n$ مثل $T(\\alpha n)+T((1-\\alpha)n)+n$ ← $\\Theta(n\\log n)$ و کمتر از $n$ ← $\\Theta(n)$",
+    "جمع اندازه‌ها برابر $n$ مثل $T(\\alpha n)+T((1-\\alpha)n)+n$ ‏←‏ $\\Theta(n\\log n)$ و کمتر از $n$ ‏←‏ $\\Theta(n)$",
     "اکرا-بازی — $p$ را از $\\sum a_i b_i^{\\,p}=1$ پیدا کن و $T=\\Theta\\big(x^p(1+\\int_1^x \\frac{g(u)}{u^{p+1}}du)\\big)$",
-    "$T(n)=aT(n-b)+c$ با $a>1$ ← $\\Theta(a^{n/b})$"
+    "$T(n)=aT(n-b)+c$ با $a>1$ ‏←‏ $\\Theta(a^{n/b})$"
   ],
   "trap": [
     "کف و سقف مثل $\\lfloor \\sqrt n \\rfloor$ در مرتبه اثری ندارد",

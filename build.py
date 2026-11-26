@@ -101,11 +101,30 @@ def font_faces():
     return '\n'.join(out)
 
 
+def check_js_syntax(js):
+    """A JS syntax error must fail the build, not show up later in the browser (needs Node; skipped without it)."""
+    import shutil, subprocess, tempfile
+    node = shutil.which('node')
+    if not node:
+        print('warning: node not found, JS syntax not checked')
+        return
+    with tempfile.NamedTemporaryFile('w', suffix='.js', delete=False, encoding='utf-8') as f:
+        f.write(js)
+        tmp = f.name
+    try:
+        r = subprocess.run([node, '--check', tmp], capture_output=True, text=True, encoding='utf-8')
+        if r.returncode != 0:
+            sys.exit('JS syntax error:\n' + (r.stderr or r.stdout)[-2000:])
+    finally:
+        os.remove(tmp)
+
+
 def page(A, head, img_url):
     data = json.dumps(runtime_data(A, img_url), ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
     js = '(function(){\n\'use strict\';\nvar KN_DATA=' + data + ';\n' + '\n'.join(rd(f) for f in js_sources()) + '\n})();'
     assert '</script' not in js.lower()
-    live = [c for c in A['courses'] if c.get('hasContent')]
+    check_js_syntax(js)
+    live =[c for c in A['courses'] if c.get('hasContent')]
     brand = A['site']['brand']
     tpl = rd(os.path.join(WEB, 'template.html'))
     html = (tpl.replace('<!--HEAD-->', head).replace('{{TITLE}}', brand).replace('{{BRAND}}', brand)
@@ -255,6 +274,10 @@ def main():
     print('self-tests: %s' % {c: len(s['ids']) for c, s in A['selftests'].items()})
     print('answer keys: all %d match keys/answer-keys.json and the official 1405 key; solver checks pass' % len(questions))
     print('tools: %d %s  figures: %d  tables: %d' % (len(reg['tool']), sorted(reg['tool']), len(reg['fig']), len(reg['table'])))
+    rvb = [b for p in A['patterns'] for b in (p.get('review') or [])]
+    print('reviews: %d of %d patterns, %d blocks (text %d, svg %d, img %d)' % (
+        sum(1 for p in A['patterns'] if p.get('review')), len(A['patterns']), len(rvb),
+        *(sum(1 for b in rvb if b['type'] == t) for t in ('text', 'svg', 'img'))))
     print('review images: %d, %d KB total' % (len(images), sum(images.values()) // 1024))
     print('wrote %s (%d KB)' % (EXE, os.path.getsize(EXE) // 1024))
     print('wrote docs/ (%d files, cache kn-%s): %s' % (len(files), digest, ', '.join(sorted(files))))

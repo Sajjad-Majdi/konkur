@@ -1,0 +1,29 @@
+[
+  {
+    "course": "ai",
+    "pattern": "A1",
+    "file": "img/ai/A1-ripples-vs-rope.webp",
+    "placeAfterBlock": 3,
+    "alt": "موج‌های دایره‌ای روی آب در برابر غارنوردی که با یک طناب در چاهی عمیق پایین می‌رود",
+    "caption": "BFS مثل موج روی آب لایه به لایه در همه جهت پخش می‌شود و حافظه زیادی می‌خواهد؛ DFS مثل غارنورد با یک طناب تا ته یک راه می‌رود و حافظه کمی می‌خواهد",
+    "prompt": "Split scene, 16:9. Left half: a calm pond seen from slightly above; a pebble has just dropped in and perfect concentric ripples spread outward ring after ring, evenly in every direction. Right half: a narrow rocky cave shaft going straight down into darkness, with a small explorer descending deep on a single rope, lit by a headlamp. The contrast reads as \"spreading wide, layer by layer\" versus \"going deep along one path\". Clean flat illustration style, soft gradients, warm muted palette (sand, teal, terracotta, soft navy). No text, no letters, no numbers, no labels, no symbols."
+  },
+  {
+    "course": "ai",
+    "pattern": "A2",
+    "file": "img/ai/A2-straight-line-heuristic.webp",
+    "placeAfterBlock": 1,
+    "alt": "پرنده‌ای که مستقیم بین دو شهر پرواز می‌کند و جاده‌ای پرپیچ‌وخم که همان دو شهر را به هم وصل می‌کند",
+    "caption": "فاصله خط مستقیم (مسیر پرنده) هیچ‌وقت از طول واقعی جاده بیشتر نیست؛ برای همین یک هیوریستیک قابل قبول است",
+    "prompt": "Bird's-eye view of gentle countryside, 16:9: two small villages, one at the lower left and one at the upper right, joined by a long winding road that curves around hills, a lake and a patch of forest. A single bird flies in a perfectly straight line directly from one village toward the other, leaving a faint dotted trail in the sky; the straight path is clearly much shorter than the winding road. Clean flat illustration style, warm muted palette (olive, sand, dusty blue, terracotta roofs). No text, no letters, no numbers, no labels, no road signs."
+  },
+  {
+    "course": "ai",
+    "pattern": "A6",
+    "file": "img/ai/A6-hill-climber-fog.webp",
+    "placeAfterBlock": 2,
+    "alt": "کوهنوردی در مه روی یک تپه کوچک ایستاده و قله بلندتر پشت مه پنهان است",
+    "caption": "تپه‌نوردی فقط اطراف نزدیک را می‌بیند: روی قله محلی می‌ایستد چون هر قدمی سرپایینی است، حتی اگر قله بلندتری دورتر باشد",
+    "prompt": "A lone hiker standing on the top of a small rounded hill in thick fog, looking around; only the nearby ground is visible and it slopes down in every direction. Far in the background, partly hidden by layers of fog, a much taller mountain peak rises above the clouds, unseen by the hiker. Calm, slightly ironic mood. Clean flat illustration style, layered soft fog, warm muted palette (peach, sage, slate blue). 16:9. No text, no letters, no numbers, no labels."
+  }
+]

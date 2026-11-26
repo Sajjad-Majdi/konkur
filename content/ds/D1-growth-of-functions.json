@@ -9,6 +9,37 @@
     "repeat": "۳ از ۵",
     "hours": 1.5
   },
+  "review": [
+    {
+      "type": "text",
+      "html": "<h4>پنج نماد</h4><div class=\"tw\"><table class=\"dt\"><thead><tr><th>نماد</th><th class=\"w\">یعنی از یک $n_0$ به بعد</th><th>با حد $L=\\lim f/g$</th></tr></thead><tbody><tr><th>$f=O(g)$</th><td class=\"w\">$f(n) \\le c\\,g(n)$ برای یک $c>0$</td><td>$L<\\infty$</td></tr><tr><th>$f=\\Omega(g)$</th><td class=\"w\">$f(n) \\ge c\\,g(n)$ برای یک $c>0$</td><td>$L>0$</td></tr><tr><th>$f=\\Theta(g)$</th><td class=\"w\">هر دو</td><td>$0<L<\\infty$</td></tr><tr><th>$f=o(g)$</th><td class=\"w\">$f(n)<c\\,g(n)$ برای <b>هر</b> $c>0$</td><td>$L=0$</td></tr><tr><th>$f=\\omega(g)$</th><td class=\"w\">$f(n)>c\\,g(n)$ برای <b>هر</b> $c>0$</td><td>$L=\\infty$</td></tr></tbody></table></div><p>ستون حد فقط وقتی کار می‌کند که حد وجود داشته باشد. برای تابع نوسانی (مثل $n^{1+\\sin n}$) برو سراغ خود تعریف؛ ممکن است هیچ‌کدام برقرار نباشد</p>"
+    },
+    {
+      "type": "text",
+      "html": "<h4>خاصیت‌ها</h4><ul><li>تعدی: اگر $f=O(g)$ و $g=O(h)$ آن‌گاه $f=O(h)$؛ برای هر پنج نماد</li><li>قرینگی: $f=\\Theta(g) \\Leftrightarrow g=\\Theta(f)$. ترانهاده: $f=O(g) \\Leftrightarrow g=\\Omega(f)$ و $f=o(g) \\Leftrightarrow g=\\omega(f)$</li><li>ضریب ثابت مهم نیست و $f+g=\\Theta(\\max(f,g))$</li><li>هر دو تابعی مقایسه‌پذیر نیستند: $n$ و $n^{1+\\sin n}$ نه O هم‌اند نه Ω</li></ul>"
+    },
+    {
+      "type": "svg",
+      "name": "figRvLadder",
+      "caption": "نردبان رشد: هر پله از پله پایینی‌اش اکیداً سریع‌تر رشد می‌کند (پله پایین $o$ پله بالاست)"
+    },
+    {
+      "type": "text",
+      "html": "<h4>قانون‌های محاسبه</h4><ul><li>پایه لگاریتم مهم نیست: $\\log_a n=\\Theta(\\log_b n)$. ولی پایه توان مهم است: $2^n=o(3^n)$</li><li>$\\log n^k=k\\log n=\\Theta(\\log n)$ ولی $\\log^k n=(\\log n)^k$ بزرگ‌تر است</li><li>استرلینگ $n! \\approx \\sqrt{2\\pi n}(n/e)^n$؛ نتیجه: $\\log n!=\\Theta(n\\log n)$ و $2^n=o(n!)$ و $n!=o(n^n)$</li><li>هر توان لگاریتم از هر توان مثبت $n$ کندتر است: $\\log^k n=o(n^{\\epsilon})$. هر چندجمله‌ای از هر نمایی کندتر است: $n^k=o(a^n)$ برای $a>1$</li><li>$2^{n+1}=\\Theta(2^n)$ ولی $2^{2n}=4^n$ و $\\Theta(2^n)$ نیست</li><li>$a^{\\log_b n}=n^{\\log_b a}$؛ مثلاً $2^{\\log_2 n}=n$ و $n^{\\log m}=m^{\\log n}$</li><li>لگاریتم گرفتن: اگر $\\log f-\\log g \\to \\infty$ آن‌گاه $f=\\omega(g)$. ولی هم‌رده بودن لگاریتم‌ها Θ بودن خود توابع را نتیجه نمی‌دهد: $\\log 4^n=2\\log 2^n$ ولی $4^n=\\omega(2^n)$</li></ul>"
+    },
+    {
+      "type": "text",
+      "html": "<h4>جمع‌های معروف</h4><ul><li>حسابی: $\\sum_{i=1}^n i=\\frac{n(n+1)}{2}=\\Theta(n^2)$ و $\\sum_{i=1}^n i^k=\\Theta(n^{k+1})$</li><li>هندسی با $r$ ثابت: $r>1$، پس $\\Theta(r^n)$ (جمله آخر غالب)؛ $r<1$، پس $\\Theta(1)$ (جمله اول غالب)</li><li>هارمونیک: $\\sum_{i=1}^n \\frac{1}{i}=\\ln n+O(1)=\\Theta(\\log n)$</li><li>$\\sum_{i=1}^n \\log i=\\log n!=\\Theta(n\\log n)$</li></ul>"
+    },
+    {
+      "type": "text",
+      "html": "<h4>شمردن حلقه‌ها</h4><div class=\"tw\"><table class=\"dt\"><thead><tr><th class=\"w\">حلقه</th><th>تعداد اجرا</th></tr></thead><tbody><tr><th class=\"w\"><code>i*=2</code> تا n</th><td>$\\Theta(\\log n)$</td></tr><tr><th class=\"w\"><code>i++</code> تا وقتی <code>i*i&lt;=n</code></th><td>$\\Theta(\\sqrt n)$</td></tr><tr><th class=\"w\"><code>i=i*i</code> از ۲ تا n</th><td>$\\Theta(\\log\\log n)$</td></tr><tr><th class=\"w\"><code>i: 1..n</code> و داخلش <code>j: 1..i</code></th><td>$\\Theta(n^2)$</td></tr><tr><th class=\"w\"><code>i: 1..n</code> و داخلش <code>j: 1..n/i</code></th><td>$\\Theta(n\\log n)$</td></tr><tr><th class=\"w\"><code>i: 1..n</code> و داخلش <code>j*=2</code> تا i</th><td>$\\Theta(n\\log n)$</td></tr><tr><th class=\"w\"><code>i*=2</code> تا n و داخلش <code>j: 1..i</code></th><td>$\\Theta(n)$</td></tr></tbody></table></div><p>آخری: $1+2+4+\\cdots+n$ یک جمع هندسی است و جمله آخر غالب است، پس $\\Theta(n)$ نه $n\\log n$</p>"
+    },
+    {
+      "type": "text",
+      "html": "<h4>مثال</h4><p>مرتب کن: $n^{\\log n}$ و $2^{\\sqrt n}$ و $n^{10}$</p><ul><li>از هر سه لگاریتم بگیر: $\\log^2 n$ و $\\sqrt n$ و $10\\log n$</li><li>ترتیب لگاریتم‌ها: $10\\log n < \\log^2 n < \\sqrt n$ و فاصله هر دو تا به بی‌نهایت می‌رود</li><li>پس $n^{10}=o(n^{\\log n})$ و $n^{\\log n}=o(2^{\\sqrt n})$</li></ul>"
+    }
+  ],
   "cue": [
     "چند تابع که باید به ترتیب رشد مرتب شوند",
     "گزاره‌هایی با O و Ω و Θ بین دو تابع",
