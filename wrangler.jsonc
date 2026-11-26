@@ -1,0 +1,6 @@
+{
+  // The site as a Cloudflare Worker with static assets (workers.dev loads in Iran; github.io does not).
+  "name": "konkur",
+  "compatibility_date": "2026-11-01",
+  "assets": { "directory": "./docs" }
+}
