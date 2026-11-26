@@ -81,9 +81,18 @@
     {
       "id": "toc",
       "name": "نظریه زبان‌ها و ماشین‌ها",
+      "short": "نظریه زبان‌ها",
+      "en": "Theory of Languages & Automata",
       "group": "specialized",
       "order": 4,
-      "hasContent": false
+      "hasContent": true,
+      "icon": "toc",
+      "color": {
+        "light": "#b4386a",
+        "lightSoft": "rgba(180,56,106,.11)",
+        "dark": "#f08ab4",
+        "darkSoft": "rgba(240,138,180,.15)"
+      }
     },
     {
       "id": "os",

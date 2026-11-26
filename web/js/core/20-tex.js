@@ -1,6 +1,7 @@
 /* core/tex: a small TeX subset renderer; rich() turns $...$ inside text into math */
-var SYM={le:'≤',leq:'≤',ge:'≥',geq:'≥',ne:'≠',neq:'≠',to:'→',rightarrow:'→',Rightarrow:'⇒',models:'⊨',land:'∧',lor:'∨',sim:'¬',lnot:'¬',times:'×',cdot:'·',ldots:'…',cdots:'⋯',infty:'∞',epsilon:'ε',alpha:'α',beta:'β',theta:'θ',Theta:'Θ',Omega:'Ω',sum:'∑',int:'∫',lfloor:'⌊',rfloor:'⌋',lceil:'⌈',rceil:'⌉',equiv:'≡','in':'∈',subseteq:'⊆',pi:'π',mid:'|',approx:'≈',star:'⋆',neg:'¬',Leftrightarrow:'⇔',iff:'⇔',prod:'∏',Delta:'Δ',omega:'ω',phi:'φ',propto:'∝',ll:'≪'};
-var REL={'≤':1,'≥':1,'≠':1,'→':1,'⇒':1,'⊨':1,'≡':1,'∈':1,'⊆':1,'≈':1,'⇔':1,'∝':1,'≪':1};
+var SYM={le:'≤',leq:'≤',ge:'≥',geq:'≥',ne:'≠',neq:'≠',to:'→',rightarrow:'→',Rightarrow:'⇒',models:'⊨',land:'∧',lor:'∨',sim:'¬',lnot:'¬',times:'×',cdot:'·',ldots:'…',cdots:'⋯',infty:'∞',epsilon:'ε',alpha:'α',beta:'β',theta:'θ',Theta:'Θ',Omega:'Ω',sum:'∑',int:'∫',lfloor:'⌊',rfloor:'⌋',lceil:'⌈',rceil:'⌉',equiv:'≡','in':'∈',subseteq:'⊆',pi:'π',mid:'|',approx:'≈',star:'⋆',neg:'¬',Leftrightarrow:'⇔',iff:'⇔',prod:'∏',Delta:'Δ',omega:'ω',phi:'φ',propto:'∝',ll:'≪',
+  cup:'∪',cap:'∩',Sigma:'Σ',Gamma:'Γ',emptyset:'∅',varnothing:'∅',lambda:'λ',delta:'δ',varepsilon:'ε',notin:'∉',subset:'⊂',subsetneq:'⊊',supseteq:'⊇',vdash:'⊢',circ:'∘',aleph:'ℵ',forall:'∀',exists:'∃',langle:'⟨',rangle:'⟩'};
+var REL={'≤':1,'≥':1,'≠':1,'→':1,'⇒':1,'⊨':1,'≡':1,'∈':1,'⊆':1,'≈':1,'⇔':1,'∝':1,'≪':1,'∉':1,'⊂':1,'⊊':1,'⊇':1,'⊢':1};
 var FN={log:1,ln:1,max:1,min:1,sin:1,cos:1,mod:1,lim:1};
 function tex(src){
   var i=0,n=src.length;
@@ -33,6 +34,7 @@ function tex(src){
     var m=/^[A-Za-z]+/.exec(src.slice(i))[0];i+=m.length;
     if(m==='frac'){var a=atom(),b=atom();return '<span class="fr"><span class="nu">'+a+'</span><span class="de">'+b+'</span></span>';}
     if(m==='sqrt'){var x=atom();return '<span class="sq"><span class="sr">√</span><span class="sx">'+x+'</span></span>';}
+    if(m==='overline'){var o=atom();return '<span class="ol">'+o+'</span>';}
     if(m==='left'||m==='right'||m==='big'||m==='Big'||m==='bigg')return '';
     if(FN[m])return '<span class="fn">'+m+'</span>';
     if(SYM[m]){var s=SYM[m];if(REL[s])return '<span class="rel">'+s+'</span><wbr>';if(s==='∑'||s==='∫'||s==='∏')return '<span class="bop">'+s+'</span>';return s;}

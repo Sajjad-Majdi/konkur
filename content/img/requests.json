@@ -25,5 +25,41 @@
     "alt": "کوهنوردی در مه روی یک تپه کوچک ایستاده و قله بلندتر پشت مه پنهان است",
     "caption": "تپه‌نوردی فقط اطراف نزدیک را می‌بیند: روی قله محلی می‌ایستد چون هر قدمی سرپایینی است، حتی اگر قله بلندتری دورتر باشد",
     "prompt": "A lone hiker standing on the top of a small rounded hill in thick fog, looking around; only the nearby ground is visible and it slopes down in every direction. Far in the background, partly hidden by layers of fog, a much taller mountain peak rises above the clouds, unseen by the hiker. Calm, slightly ironic mood. Clean flat illustration style, layered soft fog, warm muted palette (peach, sage, slate blue). 16:9. No text, no letters, no numbers, no labels."
+  },
+  {
+    "course": "toc",
+    "pattern": "T1",
+    "file": "img/toc/T1-train-loop.webp",
+    "placeAfterBlock": 4,
+    "alt": "قطار اسباب‌بازی روی ریلی که وسطش یک حلقه کوچک دارد و قطار می‌تواند چند بار دور آن بچرخد",
+    "caption": "مسیر یک DFA روی رشته‌ای بلند حتماً از یک دور می‌گذرد؛ آن دور (y) را می‌شود هر چند بار تکرار کرد یا حذف کرد و ماشین فرقش را نمی‌فهمد",
+    "prompt": "A small wooden toy train on a toy railway seen from slightly above, 16:9. The track runs from a little station on the left to a little station on the right, and in the middle it has one small circular loop where the train can go around again and again before continuing; faint motion lines show the train circling the loop. Clean flat illustration style, soft gradients, warm muted palette (cream, sage green, brick red, soft navy). No text, no letters, no numbers, no labels, no signs."
+  },
+  {
+    "course": "toc",
+    "pattern": "T2",
+    "file": "img/toc/T2-wind-up-walker.webp",
+    "placeAfterBlock": 3,
+    "alt": "آدمی با ساعت شنی که به یک ربات کوکی روی جاده‌ای بی‌انتها نگاه می‌کند و نمی‌داند کی می‌ایستد",
+    "caption": "مسئله توقف: با نگاه کردن به ماشین نمی‌شود همیشه گفت بالاخره می‌ایستد یا تا ابد راه می‌رود؛ فقط می‌شود صبر کرد",
+    "prompt": "A person sitting on a chair at the side of an endless straight road that disappears into the horizon, holding an hourglass and watching a small wind-up tin robot walking away along the road; the robot's key is still turning and there is no end of the road in sight. Calm, slightly puzzled mood. Clean flat illustration style, soft gradients, warm muted palette (peach, dusty teal, sand, slate). 16:9. No text, no letters, no numbers, no labels."
+  },
+  {
+    "course": "toc",
+    "pattern": "T3",
+    "file": "img/toc/T3-walled-garden.webp",
+    "placeAfterBlock": 0,
+    "alt": "باغی با دیوار که باغبان دو گیاه داخل آن را پیوند می‌زند و گیاه تازه هم داخل دیوار می‌روید",
+    "caption": "بستاری مثل باغ دیواردار است: اگر هر ترکیبی از گیاه‌های داخل باغ باز هم داخل باغ بروید، باغ زیر آن عمل بسته است",
+    "prompt": "A round walled garden seen from above at a gentle angle, 16:9. Inside the low stone wall a gardener is grafting two different flowering plants together, and the new combined plant is growing inside the wall too; outside the wall there are wild, different-looking plants. Peaceful mood. Clean flat illustration style, soft gradients, warm muted palette (terracotta, olive, cream, soft blue). No text, no letters, no numbers, no labels."
+  },
+  {
+    "course": "toc",
+    "pattern": "T6",
+    "file": "img/toc/T6-two-trails.webp",
+    "placeAfterBlock": 1,
+    "alt": "دو مسیر کوهستانی متفاوت که از یک نقطه جدا می‌شوند و هر دو به یک کلبه می‌رسند",
+    "caption": "گرامر مبهم مثل دو راه متفاوت به یک مقصد است: یک رشته، دو درخت اشتقاق",
+    "prompt": "A hiking trail that splits into two clearly different paths at a fork near the bottom of a hill, one winding left around a lake and one climbing right through pine trees, and both paths arrive at the same small mountain hut at the top. Two tiny hikers, one on each path. Clean flat illustration style, soft gradients, warm muted palette (sage, sand, dusty blue, rust). 16:9. No text, no letters, no numbers, no labels, no signposts."
   }
 ]

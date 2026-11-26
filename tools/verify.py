@@ -309,6 +309,131 @@ def solver_checks():
         bad = [(u, v) for u in adj for v, w in adj[u] if h[u] > w + h[v]]
         return adm, bad
     ok(check(True, h2) == (True, [('D', 'B')]) and check(True, h1) == (True, []) and check(False, h2) == (True, []), '1404 Q74 heuristics')
+    return errs + toc_checks()
+
+
+# ---------------- theory of languages: brute-force re-solving on short strings ----------------
+def _words(alpha, n):
+    """all strings over alpha with length <= n"""
+    out = ['']
+    for k in range(1, n + 1): out += [''.join(t) for t in itertools.product(alpha, repeat=k)]
+    return out
+
+
+def _lang_re(rx, alpha, n):
+    r = re.compile(rx)
+    return {w for w in _words(alpha, n) if r.fullmatch(w)}
+
+
+def _nfa(delta, starts, finals, alpha, n):
+    out = set()
+    for w in _words(alpha, n):
+        cur = set(starts)
+        for ch in w: cur = {q for p in cur for q in delta.get((p, ch), ())}
+        if cur & set(finals): out.add(w)
+    return out
+
+
+def _grammar(rules, start, terminals, maxlen, formlen):
+    """terminal strings (length <= maxlen) of a grammar; rules = [(lhs, rhs)] over one-char symbols; BFS over all
+    rewrites of sentential forms no longer than formlen (enough for the small grammars of the past questions)"""
+    seen, todo, out = {start}, [start], set()
+    while todo:
+        f = todo.pop()
+        if all(c in terminals for c in f):
+            if len(f) <= maxlen: out.add(f)
+            continue
+        for l, r in rules:
+            i = f.find(l)
+            while i >= 0:
+                g = f[:i] + r + f[i + len(l):]
+                if len(g) <= formlen and sum(c in terminals for c in g) <= maxlen + 2 and g not in seen:
+                    seen.add(g); todo.append(g)
+                i = f.find(l, i + 1)
+    return out
+
+
+def toc_checks():
+    errs = []
+    def ok(cond, msg):
+        if not cond: errs.append('solver: toc ' + msg)
+    B = '01'
+    # 1404 Q47: options 1, 3, 4 are "no 00"; option 2 differs (key 2)
+    o = [_lang_re(x, B, 10) for x in ('(0|)(1|10)*', '(0|)(11|10)*', '(1|01)*(0|)', '(0|)(11*0)*1*')]
+    ok(o[0] == o[2] == o[3] != o[1] and o[0] == {w for w in _words(B, 10) if '00' not in w}, '1404 Q47 regex')
+    # 1402 Q46: two start states q1 (final) and q0; X is the unnamed state (key 4; q1 alone gives option 3)
+    d = {('q1', '0'): ['q0'], ('q0', '0'): ['q1'], ('q0', '1'): ['q2'], ('q2', '1'): ['X'], ('X', '1'): ['q2'], ('q1', '1'): ['X']}
+    both, one = _nfa(d, ['q1', 'q0'], ['q1', 'q2'], B, 10), _nfa(d, ['q1'], ['q1', 'q2'], B, 10)
+    o = [_lang_re(x, B, 10) for x in ('(00)*(0|1)(11)*', '(00)*(|0|1)(11)*', '(00)*(|01)(11)*', '(00)*(|0|1|01)(11)*')]
+    ok(both == o[3] and all(both != x for x in o[:3]) and one == o[2], '1402 Q46 NFA to regex')
+    # 1402 Q49: rotations of 0*1* (key 1)
+    rot = {w for w in _words(B, 9) if any(re.fullmatch('0*1*', w[i:] + w[:i]) for i in range(max(1, len(w))))}
+    o = [_lang_re(x, B, 9) for x in ('0*1*0*|1*0*1*', '1*0*|0*1*', '0*1*0*', '1*0*1*')]
+    ok(rot == o[0] and all(rot != x for x in o[1:]), '1402 Q49 rotations')
+    # 1402 Q48: minimal DFA of {a^n b^n | n <= k} has 2k+2 states (Myhill-Nerode, brute force for k = 1..3), so 102 for k = 50
+    for k in (1, 2, 3):
+        inL = lambda w: w in {'a' * n + 'b' * n for n in range(k + 1)}
+        suf = _words('ab', 2 * k + 1)
+        cls = {tuple(inL(x + z) for z in suf) for x in _words('ab', 2 * k + 1)}
+        ok(len(cls) == 2 * k + 2, '1402 Q48 Myhill-Nerode k=%d gives %d' % (k, len(cls)))
+    # 1403 Q50: S -> aSc | aS | A,  A -> bAcc | bA | bAc | eps  is {a^m b^n c^p | p <= m+2n} (key 2)
+    g = _grammar([('S', 'aSc'), ('S', 'aS'), ('S', 'A'), ('A', 'bAcc'), ('A', 'bA'), ('A', 'bAc'), ('A', '')], 'S', 'abc', 7, 9)
+    abc = [(m, n, p) for m in range(8) for n in range(8) for p in range(8) if m + n + p <= 7]
+    opt = [lambda m, n, p: 2 * m + n >= p, lambda m, n, p: m + 2 * n >= p, lambda m, n, p: m + n > p, lambda m, n, p: 2 * m + 2 * n >= p]
+    o = [{'a' * m + 'b' * n + 'c' * p for m, n, p in abc if f(m, n, p)} for f in opt]
+    ok(g == o[1] and all(g != x for i, x in enumerate(o) if i != 1), '1403 Q50 grammar')
+    # 1401 Q55: grammar is {a^m b^n c^p d^q | m+n = p+q} (key 1)
+    g = _grammar([('S', 'aSd'), ('S', 'A'), ('S', 'B'), ('A', 'aAc'), ('A', 'C'), ('B', 'bBd'), ('B', 'C'), ('C', 'bCc'), ('C', '')], 'S', 'abcd', 8, 10)
+    q4 = [(m, n, p, q) for m in range(9) for n in range(9) for p in range(9) for q in range(9) if m + n + p + q <= 8]
+    opt = [lambda m, n, p, q: m + n == p + q, lambda m, n, p, q: m + p == n + q, lambda m, n, p, q: m + n + p == q, lambda m, n, p, q: m == q and n == p]
+    o = [{'a' * m + 'b' * n + 'c' * p + 'd' * q for m, n, p, q in q4 if f(m, n, p, q)} for f in opt]
+    ok(g == o[0] and all(g != x for x in o[1:]), '1401 Q55 grammar')
+    # 1400 Q53: S -> S1 B, S1 -> a S1 b, bB -> bbbB, a S1 b -> aa, B -> eps  (S1 written X)  is a^(n+1) b^(n-1+2t) (key 1)
+    g = _grammar([('S', 'XB'), ('X', 'aXb'), ('bB', 'bbbB'), ('aXb', 'aa'), ('B', '')], 'S', 'ab', 9, 12)
+    o1 = {'a' * (n + 1) + 'b' * (n - 1 + 2 * t) for n in range(1, 9) for t in range(6) if 2 * n + 2 * t <= 9}
+    o3 = {'a' * (n + 1) + 'b' * (n + k) for n in range(1, 9) for k in range(9) if 2 * n + 1 + k <= 9}
+    ok(g == o1 and g != o3, '1400 Q53 unrestricted grammar')
+    # 1401 Q53: with ? = H the grammar makes exactly a^(2^n) (key 3)
+    g = _grammar([('S', '[Ra]'), ('S', 'a'), ('Ra', 'aaR'), ('aL', 'La'), ('aH', 'Ha'), ('R]', 'L]'), ('R]', 'H'), ('[L', '[R'), ('[H', '')], 'S', 'a', 8, 12)
+    ok(g == {'a', 'aa', 'aaaa', 'a' * 8}, '1401 Q53 a^(2^n) grammar')
+    # 1404 Q48: number of parse trees in S -> A0 | S1 | 1,  A -> 1S | 1A | 0  (only 1110 is ambiguous, key 3)
+    @lru_cache(None)
+    def ts(w):
+        return (ta(w[:-1]) if w.endswith('0') and len(w) > 1 else 0) + (ts(w[:-1]) if w.endswith('1') and len(w) > 1 else 0) + (w == '1')
+    @lru_cache(None)
+    def ta(w):
+        return ((ts(w[1:]) + ta(w[1:])) if w.startswith('1') and len(w) > 1 else 0) + (w == '0')
+    ok([ts(w) for w in ('1111', '1101', '1110')] == [1, 1, 2], '1404 Q48 ambiguity')
+    # 1405 Q46: the PDA accepts L exactly by final state AND empty stack; by final state alone it accepts aab (key 1)
+    T = [('s', 'a', '', 's', 'a'), ('s', '', '', 'p', ''), ('p', 'b', 'a', 'p', ''), ('p', 'b', '', 'p', 'b'), ('p', '', '', 'q', ''), ('q', 'c', 'b', 'q', '')]
+    def runs(w):
+        seen, todo = set(), [('s', 0, '')]
+        while todo:
+            c = todo.pop()
+            if c in seen: continue
+            seen.add(c); st, i, stk = c
+            for a, x, pop, b, push in T:
+                if a != st: continue
+                if x and (i >= len(w) or w[i] != x): continue
+                if pop and not stk.endswith(pop): continue
+                ns = (stk[:-len(pop)] if pop else stk) + push
+                if len(ns) <= len(w): todo.append((b, i + (1 if x else 0), ns))
+        return seen
+    inL = lambda w: re.fullmatch('a*b*c*', w) is not None and w.count('a') + w.count('c') == w.count('b')
+    good = all(any(c == ('q', len(w), '') for c in runs(w)) == inL(w) for w in _words('abc', 6))
+    loose = any(c[0] == 'q' and c[1] == 3 for c in runs('aab'))
+    ok(good and loose and not inL('aab'), '1405 Q46 PDA acceptance')
+    # 1405 Q48 (a): a one-final-state NFA without eps for {a} U {b^n | n >= 2}
+    ok(_nfa({('0', 'a'): ['f'], ('0', 'b'): ['1'], ('1', 'b'): ['1', 'f']}, ['0'], ['f'], 'ab', 7) == {'a'} | {'b' * n for n in range(2, 8)}, '1405 Q48 NFA')
+    # 1400 Q55: classes "same state reached": 5 reachable states with representatives e, a, b, aa, ab (key 4)
+    dl = {('0', 'a'): '1', ('0', 'b'): '2', ('1', 'a'): '4', ('1', 'b'): '3', ('3', 'a'): '1', ('3', 'b'): '2', ('4', 'a'): '2', ('4', 'b'): '3', ('2', 'a'): '2', ('2', 'b'): '2'}
+    def reach(w):
+        s = '0'
+        for ch in w: s = dl[(s, ch)]
+        return s
+    rep = {}
+    for w in _words('ab', 4): rep.setdefault(reach(w), w)
+    ok(sorted(rep.values()) == sorted(['', 'a', 'b', 'aa', 'ab']) and reach('aab') == reach('ab'), '1400 Q55 classes')
     return errs
 
 

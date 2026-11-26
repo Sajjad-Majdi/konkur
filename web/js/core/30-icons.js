@@ -4,6 +4,7 @@ var IC={
   map:ic('<path d="M9 4 3.5 6v14L9 18l6 2 5.5-2V4L15 6 9 4z"/><path d="M9 4v14M15 6v14"/>'),
   ai:ic('<rect x="6.5" y="6.5" width="11" height="11" rx="3"/><path d="M10 10h4v4h-4zM12 2.5v4M12 17.5v4M2.5 12h4M17.5 12h4"/>'),
   ds:ic('<circle cx="12" cy="5" r="2.3"/><circle cx="5.5" cy="18.5" r="2.3"/><circle cx="18.5" cy="18.5" r="2.3"/><path d="M10.9 7.1 6.6 16.3M13.1 7.1l4.3 9.2"/>'),
+  toc:ic('<circle cx="6" cy="14" r="3.3"/><circle cx="18" cy="14" r="3.3"/><circle cx="18" cy="14" r="1.5"/><path d="M9.5 14h4.6M12.6 12.4l1.6 1.6-1.6 1.6"/><path d="M4.4 11.2C3.2 6.6 8.8 6.6 7.6 11.2"/>'),
   exam:ic('<path d="M5 21V4"/><path d="M5 4.5h12l-2.5 4 2.5 4H5"/>'),
   sun:ic('<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/>'),
   moon:ic('<path d="M20 14.6A8.2 8.2 0 1 1 9.4 4a6.6 6.6 0 0 0 10.6 10.6z"/>'),
