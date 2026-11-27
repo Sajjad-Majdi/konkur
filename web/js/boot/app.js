@@ -1,40 +1,36 @@
-/* boot/app: sidebar + phone bar, hash router, render, actions, keys, sheet and toasts, theme, offline (service worker) */
+/* boot/app: sidebar + phone bar, hash router, render, actions, keys, sheet and toasts, offline (service worker). Dark only. */
 var UI = { month: null, solve: null, test: {}, result: {}, rvf: 'all', rvOpen: null };
 var ROUTE = null, timerId = 0, io = null;
 const app = $('#app'), side = $('#side'), main = $('#main'), pill = $('#pill'), layer = $('#layer'), toasts = $('#toasts');
 
 /* ---------- sidebar + phone pill ---------- */
+/* desktop sidebar on every page: brand, three nav rows, every exam course in plan order (done count and plan dates),
+   then the countdown chip and the link to the exam tips */
 function vSide(r) {
-  const ts = timeState(), theme = D.documentElement.getAttribute('data-theme');
   const cur = r.cid || (r.pid && PAT[r.pid].c) || (r.qid && Q[r.qid].c);
   const crs = c => {
-    if (!c.hasContent) return `<div class="crs soon">${ring(0, 18)}<span class="nm">${esc(c.name)}</span><small>به‌زودی</small></div>`;
+    const when = courseWhen(c.id), sub = when ? `<small class="dt">${when}</small>` : '';
+    if (!c.hasContent) return `<div class="crs soon">${ring(0, 18)}<span class="nm">${esc(c.name)}${sub}</span><small class="ct">به‌زودی</small></div>`;
     const s = cst(c.id);
-    return `<a class="crs tap c-${c.id} ${cur === c.id ? 'on' : ''}" href="#/c/${c.id}">${ring(s.done / s.n, 18)}<span class="nm">${esc(c.name)}</span><small>${fa(s.done)} از ${fa(s.n)}</small></a>`;
+    return `<a class="crs tap c-${c.id} ${cur === c.id ? 'on' : ''}" href="#/c/${c.id}">${ring(s.done / s.n, 18)}<span class="nm">${esc(c.name)}${sub}</span><small class="ct">${fa(s.done)} از ${fa(s.n)}</small></a>`;
   };
-  let cd = '';
-  if (r.name !== 'home' && r.name !== 'exam') {
-    cd = ts.reg === 'open' || ts.reg === 'last'
-      ? `<a class="side-cd reg tap" href="${esc(EXAM.registration.url)}" target="_blank" rel="noopener" data-act="reg-link"><span>ثبت‌نام باز است</span><b>${fa(ts.regLeft)} روز</b></a>`
-      : ts.toExam > 0 ? `<a class="side-cd tap" href="#/exam"><span>تا کنکور</span><b>${fa(ts.toExam)} روز</b></a>` : '';
-  }
-  const lag = missed().length;
+  const lag = missed().length, list = coursesByPlan();
+  let prevG = null;
+  const rows = list.map(c => { const sep = prevG && c.group !== prevG ? '<i class="side-sep"></i>' : ''; prevG = c.group; return sep + crs(c); }).join('');
   return `<a class="brand" href="#/"><span class="logo">ک</span><b>${esc(SITE.brand)}</b></a>
-    <a class="nav-i tap ${r.name === 'home' ? 'on' : ''}" href="#/">${ic('home')}امروز</a>
-    <a class="nav-i tap ${r.name === 'plan' ? 'on' : ''}" href="#/plan">${ic('cal')}برنامه${lag ? `<small class="nav-b">${fa(lag)} روز عقب</small>` : ''}</a>
-    <a class="nav-i tap ${r.name === 'exam' ? 'on' : ''}" href="#/exam">${ic('flag')}روز آزمون</a>
-    <div class="side-h"><a href="#/courses" class="${r.name === 'courses' ? 'on' : ''}">درس‌ها</a></div>
-    ${GROUPS.map(g => `<div class="side-g">${esc(g.name)} · ضریب ${fa(g.coef)}</div>${COURSES.filter(c => c.group === g.id).map(crs).join('')}`).join('')}
-    <div class="side-foot">${cd}
-      <div class="seg" role="group" aria-label="پوسته"><button class="tap ${theme === 'light' ? 'on' : ''}" data-act="theme" data-v="light">${ic('sun', 's')}روشن</button><button class="tap ${theme === 'dark' ? 'on' : ''}" data-act="theme" data-v="dark">${ic('moon', 's')}تیره</button></div>
-    </div>`;
+    <nav class="nav">
+      <a class="nav-i tap ${r.name === 'home' ? 'on' : ''}" href="#/">${ic('home')}امروز</a>
+      <a class="nav-i tap ${r.name === 'plan' ? 'on' : ''}" href="#/plan">${ic('cal')}برنامه${lag ? `<small class="nav-b">${fa(lag)} روز عقب</small>` : ''}</a>
+      <a class="nav-i tap ${r.name === 'courses' ? 'on' : ''}" href="#/courses">${ic('book')}درس‌ها</a>
+    </nav>
+    <div class="side-crs">${rows}</div>
+    <div class="side-foot">${r.name === 'exam' ? '' : cdChip()}<a class="side-tips tap ${r.name === 'exam' ? 'on' : ''}" href="#/exam">${ic('flag', 's')}راهکارهای جلسه کنکور</a></div>`;
 }
 function vPill(r) {
   const crs = ['courses', 'course', 'pattern', 'solve', 'pdone', 'result'].includes(r.name);
-  return `<a class="tap ${r.name === 'home' ? 'on' : ''}" href="#/">${ic('home')}امروز</a>
+  return `<a class="tap ${r.name === 'home' || r.name === 'exam' ? 'on' : ''}" href="#/">${ic('home')}امروز</a>
     <a class="tap ${r.name === 'plan' ? 'on' : ''}" href="#/plan">${ic('cal')}برنامه</a>
-    <a class="tap ${crs ? 'on' : ''}" href="#/courses">${ic('book')}درس‌ها</a>
-    <a class="tap ${r.name === 'exam' ? 'on' : ''}" href="#/exam">${ic('flag')}روز آزمون</a>`;
+    <a class="tap ${crs ? 'on' : ''}" href="#/courses">${ic('book')}درس‌ها</a>`;
 }
 
 /* ---------- router ---------- */
@@ -128,18 +124,6 @@ function toast(html, ms = 3400) {
   return t;
 }
 
-/* ---------- theme ---------- */
-function systemDark() { try { return matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) { return false; } }
-function applyTheme() {
-  const t = S.theme === 'light' || S.theme === 'dark' ? S.theme : (systemDark() ? 'dark' : 'light');
-  D.documentElement.setAttribute('data-theme', t);
-  const m = $('meta[name="theme-color"]'); if (m) m.setAttribute('content', t === 'dark' ? '#13151d' : '#f1ece1');
-}
-function setTheme(t) {
-  const go = () => { S.theme = t; save(); applyTheme(); render(); };
-  if (D.startViewTransition && !reduced()) D.startViewTransition(go); else go();
-}
-
 /* ---------- actions ---------- */
 function weakSheet() {
   const w = weak(); if (!w.length) return;
@@ -155,8 +139,6 @@ D.addEventListener('click', e => {
   e.preventDefault();
   const T = r && r.cid ? UI.test[r.cid] : null;
   switch (act) {
-    case 'theme': setTheme(v); break;
-    case 'theme-toggle': setTheme(D.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'); break;
     case 'reg-done': S.reg = 1; save(); render(); toast(`${ic('check')}یادآور ثبت‌نام بسته شد`); break;
     case 'text-done': S.plan[a.dataset.d] = 1; save(); render(); break;
     case 'weak-sheet': weakSheet(); break;
@@ -188,7 +170,7 @@ D.addEventListener('click', e => {
     case 't-quit': closeSheet(); delete UI.test[r.cid]; location.hash = '#/c/' + r.cid; break;
     case 'rv-f': UI.rvf = v; UI.rvOpen = null; render(); break;
     case 'rv-open': UI.rvOpen = UI.rvOpen === v ? null : v; render(); break;
-    case 'month': UI.month = +v; render(); break;
+    case 'month': { const n = planMonths().length; UI.month = Math.max(0, Math.min(n - 1, +v)); if (r.name !== 'plan') location.hash = '#/plan'; else render(); break; }
     case 'shift': { const m = shiftPlan(+v); if (!m.move) break; S.sh = (+S.sh || 0) + m.move; S.cut = (+S.cut || 0) + m.fromRev; buildPlan(); save(); render();
       toast(`${ic('cal')}برنامه ${fa(m.move)} روز جلو رفت${m.fromRev ? ` و ${fa(m.fromRev)} روز از جمع‌بندی کم شد` : ` و ذخیره ${fa(Math.max(0, buffer()))} روز شد`}${m.left && missed().length ? ` و هنوز ${fa(missed().length)} روز عقبی` : ''}`, 4600); break; }
     case 'reload': location.reload(); break;
@@ -221,8 +203,6 @@ addEventListener('hashchange', () => { closeSheet(); render(); });
 /* a new day (or a long pause) redraws the dates */
 D.addEventListener('visibilitychange', () => { if (!D.hidden && todayMs() !== TODAY && ROUTE && ROUTE.name !== 'test') render(); });
 setInterval(() => { if (todayMs() !== TODAY && ROUTE && ROUTE.name !== 'test' && !layer.innerHTML) render(); }, 60000);
-try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (S.theme !== 'light' && S.theme !== 'dark') { applyTheme(); render(); } }); } catch (e) { }
-applyTheme();
 render();
 
 /* ---------- offline: only the hosted build links a manifest and ships sw.js ---------- */

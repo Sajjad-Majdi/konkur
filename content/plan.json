@@ -1,14 +1,13 @@
 {
- "_note": "Plan v2: every course of the 1406 exam from start to the exam. Days follow calendar dates from \"start\" (the reader can move the plan forward). A phase has \"days\" (patterns, text, tests) or \"soon\": N days for a course without content yet.",
+ "_note": "Plan v2: every course of the 1406 exam from start to the exam. Days follow calendar dates from \"start\" (the reader can move the plan forward). A phase has \"days\" (patterns, text, tests) or \"soon\": N days for a course without content yet. AI (p1) and DS (p1b) are two phases; the 1405/1404 booklet days of section 56-75 (both courses) sit at the end of DS, after both are studied.",
  "start": "2026-11-26",
  "phases": [
   {
    "id": "p1",
-   "name": "هوش مصنوعی و ساختمان داده",
-   "short": "هوش و ساختمان داده",
+   "name": "هوش مصنوعی",
+   "short": "هوش مصنوعی",
    "courses": [
-    "ai",
-    "ds"
+    "ai"
    ],
    "days": [
     {
@@ -26,13 +25,6 @@
      "extra": "با ابزار هیوریستیک"
     },
     {
-     "id": "d3",
-     "patterns": [
-      "D2"
-     ],
-     "extra": "با ابزار قضیه اصلی"
-    },
-    {
      "id": "d4",
      "patterns": [
       "A7"
@@ -46,22 +38,52 @@
      ]
     },
     {
-     "id": "d6",
-     "patterns": [
-      "D6"
-     ],
-     "extra": "با ماشین‌حساب هافمن"
-    },
-    {
-     "id": "d7",
-     "text": "مرور تله‌های هفته و حل دوباره سوال‌هایی که غلط زدی"
-    },
-    {
      "id": "d8",
      "patterns": [
       "A3"
      ],
      "extra": "با شبیه‌ساز آلفا-بتا"
+    },
+    {
+     "id": "d13",
+     "patterns": [
+      "A5"
+     ]
+    },
+    {
+     "id": "d7",
+     "text": "مرور تله‌های هوش مصنوعی و حل دوباره غلط‌ها"
+    },
+    {
+     "id": "d14",
+     "text": "آزمونک هوش مصنوعی",
+     "tests": [
+      "ai"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "p1b",
+   "name": "ساختمان داده و الگوریتم",
+   "short": "ساختمان داده",
+   "courses": [
+    "ds"
+   ],
+   "days": [
+    {
+     "id": "d3",
+     "patterns": [
+      "D2"
+     ],
+     "extra": "با ابزار قضیه اصلی"
+    },
+    {
+     "id": "d6",
+     "patterns": [
+      "D6"
+     ],
+     "extra": "با ماشین‌حساب هافمن"
     },
     {
      "id": "d9",
@@ -89,16 +111,13 @@
      ]
     },
     {
-     "id": "d13",
-     "patterns": [
-      "A5"
-     ]
+     "id": "ds-r",
+     "text": "مرور تله‌های ساختمان داده و حل دوباره غلط‌ها"
     },
     {
-     "id": "d14",
-     "text": "آزمونک هوش مصنوعی و آزمونک ساختمان داده",
+     "id": "ds-t",
+     "text": "آزمونک ساختمان داده",
      "tests": [
-      "ai",
       "ds"
      ]
     },
@@ -119,16 +138,8 @@
      "text": "تحلیل غلط‌های ۱۴۰۴"
     },
     {
-     "id": "d19",
-     "text": "دفترچه ۱۴۰۳ سوال ۵۶ تا ۷۵ در ۴۵ دقیقه"
-    },
-    {
-     "id": "d20",
-     "text": "مرور بخش تله‌های هر دو درس"
-    },
-    {
      "id": "d21",
-     "text": "هر دو آزمونک دوباره و مقایسه با نمره هفته دوم",
+     "text": "هر دو آزمونک دوباره و مقایسه با نمره قبلی",
      "tests": [
       "ai",
       "ds"
@@ -198,15 +209,6 @@
      ]
     }
    ]
-  },
-  {
-   "id": "p3",
-   "name": "مبانی کامپیوتر و برنامه‌سازی",
-   "short": "مبانی",
-   "courses": [
-    "basics"
-   ],
-   "soon": 14
   },
   {
    "id": "p4",
@@ -292,6 +294,15 @@
      "text": "تحلیل غلط‌ها و مرور الگوهای ضعیف سیستم عامل"
     }
    ]
+  },
+  {
+   "id": "p3",
+   "name": "مبانی کامپیوتر و برنامه‌سازی",
+   "short": "مبانی",
+   "courses": [
+    "basics"
+   ],
+   "soon": 14
   },
   {
    "id": "p5",

@@ -5,12 +5,19 @@ var SEC_PER_Q=135;
 var STG={read:'یادآوری',ex:'مثال حل‌شده',pr:'تمرین'};
 var SRCN={k:'کلید سنجش',s:'کلید نهایی سنجش',v:'حل مستقل'};
 
-/* ---- one-time migration of v1 progress: a pattern with answered practice counts as read and example seen ---- */
+/* ---- one-time migrations of stored progress (the key stays kn1406.v1) ----
+   v1 -> v2: a pattern with answered practice counts as read and example seen
+   v2 -> v3: AI and DS became two plan phases; the old shared self-test day d14 (both tests) now also stands for the DS
+   self-test day ds-t, so a finished d14 keeps both done. The site is dark only, so a saved theme choice is dropped. */
 (function migrate(){
-  if(S.v===2)return;
-  PATTERNS.forEach(function(p){if(p.pr.some(answered)){S.rd[p.id]=1;S.exd[p.id]=1;}});
-  Object.keys(S.test).forEach(function(c){var t=S.test[c];if(!t||typeof t!=='object')delete S.test[c];else if(!Array.isArray(t.h))t.h=[];});
-  S.v=2;save();
+  var v=+S.v||1;
+  if(v<2){
+    PATTERNS.forEach(function(p){if(p.pr.some(answered)){S.rd[p.id]=1;S.exd[p.id]=1;}});
+    Object.keys(S.test).forEach(function(c){var t=S.test[c];if(!t||typeof t!=='object')delete S.test[c];else if(!Array.isArray(t.h))t.h=[];});
+    v=2;
+  }
+  if(v<3){if(S.plan.d14)S.plan['ds-t']=1;delete S.theme;v=3;}
+  if(S.v!==v){S.v=v;save();}
 })();
 if(!S.ps||!/^\d{4}-\d{2}-\d{2}$/.test(S.ps)){S.ps=isoOf(Math.max(ymd(PLANDATA.start),TODAY));save();}
 
@@ -89,7 +96,7 @@ function phaseOf(k){for(var i=0;i<PHASES.length;i++)if(k>=PHASES[i].from&&k<=PHA
 function heroModel(){
   var k=Math.min(LP.length,todayN()),lag=missed().length;
   var d=LP.slice(0,Math.max(0,k)).filter(function(x){return !x.soon&&!dayDone(x);})[0];
-  var rest=RANK.filter(function(id){return !pst(id).done;})[0];
+  var rest=planOrder().filter(function(id){return !pst(id).done;})[0];
   function free(){return {kind:pst(rest).started?'go':'start',d:{pats:[rest],ph:-1,n:0},pid:rest,behind:0,lag:0};}
   if(d){
     var behind=d.n<k?d.n:0;
@@ -112,6 +119,15 @@ function timeState(t,regDone){
   else reg='after';
   return {t:t,toExam:dd(t,EXAMD),reg:reg,toReg:dd(t,REG_S),regLeft:dd(t,REG_E)+1};
 }
+/* patterns in the order the plan schedules them (patterns outside the plan follow in study order) */
+function planOrder(){var o=[];LP.forEach(function(d){d.pats.forEach(function(id){if(o.indexOf(id)<0)o.push(id);});});RANK.forEach(function(id){if(o.indexOf(id)<0)o.push(id);});return o;}
+function nextInPlan(id){var o=planOrder();return o[o.indexOf(id)+1]||null;}
+/* the plan days of a course: first and last day number of the phases that hold it (null when the plan has none) */
+function courseSpan(c){var a=0,b=0;PHASES.forEach(function(ph){if(ph.courses.indexOf(c)>=0){if(!a||ph.from<a)a=ph.from;if(ph.to>b)b=ph.to;}});return a?{from:a,to:b}:null;}
+/* "۶ تا ۱۳ آذر", across months "۲۸ آذر تا ۶ دی" (no year) */
+function spanFa(a,b){var ja=jp(a),jb=jp(b);return ja[1]===jb[1]?fa(ja[2])+' تا '+fa(jb[2])+' '+JMON[jb[1]-1]:jdate(a)+' تا '+jdate(b);}
+/* every exam course in plan order (live courses are planned first), courses without plan days last */
+function coursesByPlan(){return COURSES.slice().sort(function(x,y){var a=courseSpan(x.id),b=courseSpan(y.id);return (a?a.from:1e4)-(b?b.from:1e4)||x.order-y.order;});}
 /* calendar months (Shamsi) from the plan start to the exam */
 function planMonths(){
   var out=[],a=Math.min(ymd(S.ps),planStart(),TODAY),seen={};

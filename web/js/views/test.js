@@ -56,7 +56,7 @@ function vResult(r) {
   const rc = 2 * Math.PI * 63, col = score >= 50 ? 'var(--ok)' : score >= 25 ? 'var(--amber-2)' : 'var(--bad)';
   const stat = (a, id) => !a ? 'e' : a === Q[id].key ? 'g' : 'r';
   const f = UI.rvf;
-  const rows = ids.map((id, i) => ({ id, i, a: R.a[i], s: stat(R.a[i], id) })).filter(x => f === 'all' || (f === 'w' && x.s === 'r') || (f === 'b' && x.s === 'e')).map(x => {
+  const rows = ids.map((id, i) => ({ id, i, a: R.a[i], s: stat(R.a[i], id) })).filter(x => f === 'all' || (f === 'c' && x.s === 'g') || (f === 'w' && x.s === 'r') || (f === 'b' && x.s === 'e')).map(x => {
     const q = Q[x.id], p = q.pat ? PAT[q.pat] : null, open = UI.rvOpen === x.id;
     return `<div><button class="rrow tap" data-act="rv-open" data-v="${x.id}" aria-expanded="${open}"><span class="qn ${x.s}">${fa(x.i + 1)}</span><span style="min-width:0"><div class="t1">${plain(q.t)}</div><div class="t2">${qref(q)}${p ? ' · ' + esc(p.t) : ''}</div></span>
       <span class="an">${x.a ? `جواب تو <b class="${x.s}">${fa(x.a)}</b> · ` : 'نزده · '}کلید <b class="g">${fa(q.key)}</b></span><span class="go">${open ? 'بستن' : 'راه‌حل'}${ic('chd', 's')}</span></button>
@@ -64,16 +64,11 @@ function vResult(r) {
   }).join('');
   const sg = (v, l) => `<button class="tap ${f === v ? 'on' : ''}" data-act="rv-f" data-v="${v}">${l}</button>`;
   return `<div class="view wrap c-${c.id}">${tb(`#/c/${c.id}`, 'نتیجه آزمونک ' + esc(cShort(c.id)))}
-    <header class="ph"><div><nav class="crumb"><a href="#/c/${c.id}">${esc(c.name)}</a>${ic('chl')}<span>آزمونک</span></nav><h1>نتیجه آزمونک ${esc(cShort(c.id))}</h1></div>
-      <div style="margin-inline-start:auto;display:flex;gap:10px"><a class="btn ghost tap" href="#/t/${c.id}">${ic('retry', 's')}آزمونک دوباره</a><a class="btn ghost tap" href="#/c/${c.id}">برگشت به درس${ic('arl', 's')}</a></div></header>
-    <div class="res-top">
-      <section class="card score"><div class="ringbig"><svg viewBox="0 0 150 150"><circle cx="75" cy="75" r="63" stroke="var(--sunken)"/><circle cx="75" cy="75" r="63" stroke="${col}" stroke-linecap="round" stroke-dasharray="${rc.toFixed(1)}" stroke-dashoffset="${(rc * (1 - Math.max(0, score) / 100)).toFixed(1)}" style="transition:stroke-dashoffset 1s"/></svg><b>${pctFa(score)}</b></div>
+    <header class="ph res-h"><nav class="crumb"><a href="#/c/${c.id}">${esc(c.name)}</a>${ic('chl')}<span>آزمونک</span></nav><h1>نتیجه آزمونک ${esc(cShort(c.id))}</h1></header>
+    <section class="card score"><div class="ringbig"><svg viewBox="0 0 150 150"><circle cx="75" cy="75" r="63" stroke="var(--sunken)"/><circle cx="75" cy="75" r="63" stroke="${col}" stroke-linecap="round" stroke-dasharray="${rc.toFixed(1)}" stroke-dashoffset="${(rc * (1 - Math.max(0, score) / 100)).toFixed(1)}" style="transition:stroke-dashoffset 1s"/></svg><b>${pctFa(score)}</b></div>
         <div><h2>نمره با نمره منفی</h2><div class="fm">${rich(`$\\frac{3 \\times ${R.c} - ${R.w}}{3 \\times ${R.n}}$`)}</div>
-          <div class="cmp"><span><b>${pctFa(raw)}</b>بدون نمره منفی</span><span><b>${fa(Math.round((R.u || 0) / 60))} از ${fa(Math.round(R.n * SEC_PER_Q / 6) / 10)}</b>دقیقه</span>${prev ? `<span><b>${pctFa(testPct(prev))}</b>دفعه قبل</span>` : ''}</div></div></section>
-      <section class="card bkd"><div class="nums"><div class="g"><b>${fa(R.c)}</b><span>درست</span></div><div class="r"><b>${fa(R.w)}</b><span>غلط</span></div><div><b>${fa(R.b)}</b><span>نزده</span></div></div>
-        <div class="qstrip">${ids.map((id, i) => `<i class="${stat(R.a[i], id)}">${fa(i + 1)}</i>`).join('')}</div>
-        <div class="muted" style="font-size:13px">${R.w ? `${fa(R.w)} غلط ${pctFa(R.w / (3 * R.n) * 100)} از نمره را پاک کرد` : 'هیچ غلطی نمره کم نکرد'}</div></section>
-    </div>
-    <section class="panel rv"><div class="rv-h"><h2 class="h2">سوال به سوال</h2><div class="seg">${sg('all', 'همه')}${sg('w', `غلط‌ها ${fa(R.w)}`)}${sg('b', `نزده ${fa(R.b)}`)}</div></div>${rows || '<div class="muted" style="padding:16px">موردی نیست</div>'}</section>
+          <div class="cmp"><span><b>${pctFa(raw)}</b>بدون نمره منفی</span><span><b>${fa(Math.round((R.u || 0) / 60))} از ${fa(Math.round(R.n * SEC_PER_Q / 6) / 10)}</b>دقیقه</span>${prev ? `<span><b>${pctFa(testPct(prev))}</b>دفعه قبل</span>` : ''}</div></div>
+      <div class="acts"><a class="btn soft tap" href="#/t/${c.id}">${ic('retry', 's')}آزمونک دوباره</a><a class="btn ghost tap" href="#/c/${c.id}">برگشت به درس${ic('arl', 's')}</a></div></section>
+    <section class="rv"><div class="rv-h"><h2 class="h2">سوال به سوال</h2><div class="seg">${sg('all', `همه <b>${fa(R.n)}</b>`)}${sg('c', `درست <b class="g">${fa(R.c)}</b>`)}${sg('w', `غلط <b class="r">${fa(R.w)}</b>`)}${sg('b', `نزده <b>${fa(R.b)}</b>`)}</div></div>${rows || '<div class="muted" style="padding:16px">موردی نیست</div>'}</section>
   </div>`;
 }

@@ -5,7 +5,7 @@ Each course is split into **patterns**: question types that come back year after
 review, how to recognise it, a fast method, common traps, an interactive tool where useful, a worked past question,
 and past questions to practise with step-by-step solutions. Each course also has a timed self-test with negative marking.
 
-The site is Persian, right-to-left, works on phones and desktops, has light and dark themes, and runs fully offline.
+The site is Persian, right-to-left, works on phones and desktops, uses one dark theme, and runs fully offline.
 Progress is kept in the browser (`localStorage`, key `kn1406.v1`).
 
 ## Layout
@@ -15,7 +15,7 @@ build.py                 builds everything (plain Python 3, no packages)
 tools/verify.py          all checks; build.py runs them, or run it alone
 content/
   courses.json           exam info + every course of the exam (registry)
-  site.json              page texts (exam day; older home texts kept)
+  site.json              page texts (exam tips page; older home texts kept)
   plan.json              study plan to the exam: phases -> days (see below)
   <course>/<ID>-<slug>.json   one file per pattern, with its questions
   <course>/selftest.json      self-test question list (+ questions used only there)
@@ -25,10 +25,10 @@ fonts/                   Vazirmatn (SIL Open Font License 1.1)
 web/
   template.html, style.css
   js/core/               helpers, storage (+ migration), math renderer, icons, dates, registries, plan/progress model
-  js/components/         shared pieces (rings, method card, options, steps, review blocks), tool widgets
+  js/components/         shared pieces (rings, method card, options, steps, review blocks, home map), tool widgets
   js/tools/              one file per interactive tool / figure / table
-  js/views/              today, plan, courses + course, pattern, practice, self-test + result, exam day
-  js/boot/               sidebar + phone bar, hash router (#/, #/plan, #/c/<id>, #/p/<id>, #/p/<id>/q/<n>, #/q/<qid>, #/t/<id>, #/exam), actions, theme, offline
+  js/views/              today, plan, courses + course, pattern, practice, self-test + result, exam tips
+  js/boot/               sidebar + phone bar, hash router (#/, #/plan, #/c/<id>, #/p/<id>, #/p/<id>/q/<n>, #/q/<qid>, #/t/<id>, #/exam), actions, offline
 docs/                    build output for GitHub Pages (commit this folder)
 ```
 
@@ -65,12 +65,12 @@ questions per course and per year, keys checked, tools, image sizes.
 
 1. In `content/courses.json` set `"hasContent": true` for the course and give it a `short` name for the
    navigation bar, an `icon` (a name from `web/js/core/30-icons.js`, or leave it out) and a `color`:
-   `{"light": "#hex", "lightSoft": "rgba(...)", "dark": "#hex", "darkSoft": "rgba(...)"}`.
+   `{"dark": "#hex", "darkSoft": "rgba(...)"}` (the site is dark only).
 2. Create `content/<course id>/` and add pattern files (below) and, if you want a self-test, `selftest.json`.
 3. Add every question id and its key to `keys/answer-keys.json` (`expected`).
 4. Run `python build.py`.
 
-The sidebar, the courses page, the course page and the exam-structure card are all generated from the registry.
+The sidebar, the home map, the courses page (with the exam-structure bar) and the course page are all generated from the registry.
 A course without content shows as «به‌زودی» and gets no page. Give its plan phase real days (below) once it has content.
 
 ## Study plan (`content/plan.json`)
@@ -78,9 +78,10 @@ A course without content shows as «به‌زودی» and gets no page. Give its
 ```json
 { "start": "2026-11-26",
   "phases": [
-    { "id": "p1", "name": "هوش مصنوعی و ساختمان داده", "short": "هوش و ساختمان داده", "courses": ["ai", "ds"],
+    { "id": "p1", "name": "هوش مصنوعی", "short": "هوش مصنوعی", "courses": ["ai"],
       "days": [ { "id": "d1", "patterns": ["A1", "A6"] }, { "id": "d2", "patterns": ["A2"], "extra": "با ابزار هیوریستیک" },
-                { "id": "d14", "text": "آزمونک هوش مصنوعی و آزمونک ساختمان داده", "tests": ["ai", "ds"] } ] },
+                { "id": "d14", "text": "آزمونک هوش مصنوعی", "tests": ["ai"] } ] },
+    { "id": "p1b", "name": "ساختمان داده و الگوریتم", "short": "ساختمان داده", "courses": ["ds"], "days": [ ... ] },
     { "id": "p3", "name": "مبانی کامپیوتر و برنامه‌سازی", "short": "مبانی", "courses": ["basics"], "soon": 14 },
     { "id": "p8", "name": "جمع‌بندی و آزمون کامل", "short": "جمع‌بندی", "final": true, "days": [ ... ] } ] }
 ```

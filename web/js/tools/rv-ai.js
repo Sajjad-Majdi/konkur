@@ -1,5 +1,5 @@
 /* tools/rv-ai: exact figures for the AI «یادآوری» refreshers (figRv*), plus the small SVG helpers the DS refresher figures share.
-   Colours come from CSS classes (.rf, .rf-*) so every figure follows the light/dark theme; labels are Latin (LTR) on purpose. */
+   Colours come from CSS classes (.rf, .rf-*) so every figure follows the site palette; labels are Latin (LTR) on purpose. */
 function rfSvg(w,h,label,body,cls){return '<svg viewBox="0 0 '+w+' '+h+'" class="'+(cls||'rf')+'" role="img" aria-label="'+label+'">'+body+'</svg>';}
 function rfL(x1,y1,x2,y2,c){return '<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" class="rf-e'+(c?' '+c:'')+'"/>';}
 function rfC(x,y,r,c){return '<circle cx="'+x+'" cy="'+y+'" r="'+r+'" class="'+c+'"/>';}

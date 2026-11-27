@@ -44,7 +44,7 @@
       "id": "basics",
       "name": "مبانی کامپیوتر و برنامه‌سازی",
       "group": "specialized",
-      "order": 3,
+      "order": 5,
       "hasContent": false
     },
     {
@@ -73,8 +73,6 @@
       "hasContent": true,
       "icon": "ds",
       "color": {
-        "light": "#0f8a7a",
-        "lightSoft": "rgba(15,138,122,.12)",
         "dark": "#45cdb7",
         "darkSoft": "rgba(69,205,183,.14)"
       }
@@ -85,12 +83,10 @@
       "short": "نظریه زبان‌ها",
       "en": "Theory of Languages & Automata",
       "group": "specialized",
-      "order": 4,
+      "order": 3,
       "hasContent": true,
       "icon": "toc",
       "color": {
-        "light": "#b4386a",
-        "lightSoft": "rgba(180,56,106,.11)",
         "dark": "#f08ab4",
         "darkSoft": "rgba(240,138,180,.15)"
       }
@@ -101,12 +97,10 @@
       "short": "سیستم عامل",
       "en": "Operating Systems",
       "group": "specialized",
-      "order": 5,
+      "order": 4,
       "hasContent": true,
       "icon": "os",
       "color": {
-        "light": "#5f7d12",
-        "lightSoft": "rgba(95,125,18,.12)",
         "dark": "#a8d05a",
         "darkSoft": "rgba(168,208,90,.15)"
       }
@@ -122,8 +116,6 @@
       "hasContent": true,
       "icon": "ai",
       "color": {
-        "light": "#5b4bd6",
-        "lightSoft": "rgba(91,75,214,.11)",
         "dark": "#a395ff",
         "darkSoft": "rgba(163,149,255,.15)"
       }

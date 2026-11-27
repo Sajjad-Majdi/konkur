@@ -13,8 +13,17 @@ function freq(p,withText){
 }
 function hours(h){return fa(h)+' ساعت';}
 function qref(q){return 'کنکور '+fa(q.y)+' · سوال '+fa(q.n);}
-function tb(back,title,right,sub){return '<div class="tb">'+(back?'<a class="ibtn tap" href="'+back+'" aria-label="برگشت">'+ic('arr')+'</a>':'<span class="logo">ک</span>')+'<div class="ttl">'+title+(sub?' <span class="sub">'+sub+'</span>':'')+'</div>'+(right||'')+'</div>';}
-function themeBtn(){return '<button class="ibtn tap" data-act="theme-toggle" aria-label="تغییر پوسته">'+ic(D.documentElement.getAttribute('data-theme')==='dark'?'sun':'moon')+'</button>';}
+/* phone/tablet top bar: logo or back arrow and the title on the right, the countdown chip on the left (right=false: none) */
+function tb(back,title,right,sub){return '<div class="tb">'+(back?'<a class="ibtn tap" href="'+back+'" aria-label="برگشت">'+ic('arr')+'</a>':'<a class="logo tap" href="#/" aria-label="امروز">ک</a>')+'<div class="ttl">'+title+(sub?' <span class="sub">'+sub+'</span>':'')+'</div>'+(right===undefined?cdChip():right||'')+'</div>';}
+/* the only place with the exam date and the days left: the corner chip (sidebar foot on desktop, top bar on phone).
+   While registration is open it turns into an amber link to the registration site. */
+function cdChip(){
+  var ts=timeState(),u=esc(EXAM.registration.url);
+  if(ts.reg==='open'||ts.reg==='last')return '<a class="cd reg tap" href="'+u+'" target="_blank" rel="noopener" data-act="reg-link"><small>'+(ts.reg==='last'?'ثبت‌نام':'ثبت‌نام باز است')+'</small><b>'+(ts.reg==='last'?'امروز آخرین روز':fa(ts.regLeft)+' روز')+'</b></a>';
+  if(ts.toExam>0)return '<span class="cd"><small>کنکور '+jdate(EXAMD)+'</small><b>'+fa(ts.toExam)+' روز</b></span>';
+  if(ts.toExam===0)return '<span class="cd"><small>کنکور</small><b>امروز</b></span>';
+  return '';
+}
 function segbar(c){
   return '<div class="segbar">'+byRank(c).map(function(id){var s=pst(id),p=s.done?1:s.started?((s.read?1:0)+(s.ex?1:0)+s.ans/s.tot)/3:0;
     return '<i class="'+(s.done?'done':s.started?'part':'')+'" style="--p:'+Math.round(p*100)+'%" title="'+esc(PAT[id].t)+'"></i>';}).join('')+'</div>';
